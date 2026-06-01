@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:monument-marzipan-840131.netlify.app)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
+    ]
+  }
+}
