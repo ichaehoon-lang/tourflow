@@ -966,18 +966,42 @@ function showTourLogin() {
 function showTourApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
-    document.getElementById('company-name').innerText = tourProfile?.company_name || tourProfile?.company_id || 'Company';
+    document.getElementById('company-name').innerText = tourProfile?.company_name || tourUser?.email || tourProfile?.company_id || 'Company';
     loadDashboard();
     loadQuotes();
 }
 
 async function loadTourProfile(user) {
-    const { data, error } = await sb.from('profiles').select('company_id, company_name').eq('id', user.id).single();
-    if (error) {
+    if (!user || !user.id) return null;
+    const email = (user.email || '').trim();
+
+    let { data, error } = await sb.from('profiles').select('company_id, company_name').eq('id', user.id).single();
+    if (error && error.code !== 'PGRST116') {
         console.warn('loadTourProfile error', error);
-        return null;
     }
-    return data;
+
+    if (data && data.company_id) {
+        return data;
+    }
+
+    if (email) {
+        const escapedEmail = email.replace(/'/g, "''");
+        const companyQuery = sb.from('companies').select('id, company_name, name, email, company_email');
+        const emailMatch = `email.ilike.${escapedEmail}`;
+        const companyEmailMatch = `company_email.ilike.${escapedEmail}`;
+        const { data: companyData, error: compErr } = await companyQuery.or(`${emailMatch},${companyEmailMatch}`).single();
+        if (compErr && compErr.code !== 'PGRST116') {
+            console.warn('loadTourProfile company lookup error', compErr);
+        }
+        if (companyData) {
+            return {
+                company_id: companyData.id,
+                company_name: companyData.company_name || companyData.name || companyData.email || companyData.company_email || email
+            };
+        }
+    }
+
+    return data || { company_id: null, company_name: user.email || null };
 }
 
 async function tourLogin() {
@@ -991,9 +1015,11 @@ async function tourLogin() {
     if (error) { msg.innerText = error.message; return; }
     tourUser = data.user;
     tourProfile = await loadTourProfile(tourUser);
-    if (!tourProfile || !tourProfile.company_id) {
-        msg.innerText = '회사 정보가 없습니다. 관리자에게 문의하세요.';
-        return;
+    if (!tourProfile) {
+        tourProfile = { company_id: null, company_name: tourUser.email || '회사 관리자' };
+        msg.innerText = '회사 정보가 없어도 계속 진행합니다. 설정 후 회사 정보를 추가하세요.';
+    } else if (!tourProfile.company_id) {
+        msg.innerText = '회사 정보가 없어도 계속 진행합니다. 일부 데이터는 표시되지 않을 수 있습니다.';
     }
     showTourApp();
 }
@@ -1010,7 +1036,7 @@ async function initTourflow() {
     if (user) {
         tourUser = user;
         tourProfile = await loadTourProfile(user);
-        if (tourProfile && tourProfile.company_id) {
+        if (tourProfile) {
             showTourApp();
             return;
         }

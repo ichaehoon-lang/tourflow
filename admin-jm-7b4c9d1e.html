@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>JM Super Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{background:#f2f2f7}
+    body{font-family:'SF Pro Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#1c1c1e;padding:20px}
+    .container{max-width:1080px;margin:0 auto}
+    .card{background:#fff;border-radius:24px;padding:20px;margin-bottom:18px;box-shadow:0 18px 40px rgba(0,0,0,0.06)}
+    h1{font-size:24px;margin-bottom:10px}
+    h2{font-size:18px;margin-bottom:10px}
+    .subtitle{color:#6a6a70;font-size:14px;margin-bottom:18px;line-height:1.5}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}
+    .stat{background:#f7f7f7;border-radius:18px;padding:18px;text-align:center;border:1px solid #e9e9ec}
+    .stat .num{font-weight:800;font-size:22px;color:#1c1c1e}
+    .stat .label{font-size:12px;color:#6a6a70;margin-top:8px;letter-spacing:.08em;text-transform:uppercase}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:14px}
+    .controls label{font-size:13px;color:#6a6a70;display:flex;flex-direction:column;gap:6px}
+    input,select{padding:12px 14px;border-radius:16px;border:1px solid #d1d1d6;background:#f7f7f7;font-size:15px;color:#1c1c1e;min-width:180px}
+    button{padding:12px 16px;border-radius:16px;border:none;background:#1c1c1e;color:#fff;font-weight:700;cursor:pointer;transition:opacity .2s}
+    button:hover{opacity:.9}
+    button.csv-btn{background:#f2f2f7;color:#1c1c1e;border:1px solid #d1d1d6}
+    .hidden{display:none}
+    .center{display:flex;justify-content:center;align-items:center}
+    .login-card{max-width:420px;margin:80px auto 0;padding:28px;background:#fff;border-radius:28px;box-shadow:0 28px 60px rgba(0,0,0,0.08)}
+    .login-card h1{font-size:28px;margin-bottom:12px}
+    .login-card p{color:#6a6a70;font-size:14px;margin-bottom:20px}
+    .message{min-height:22px;font-size:14px;color:#ff3b30;margin-top:12px}
+    table{width:100%;border-collapse:collapse;margin-top:18px}
+    th,td{padding:12px 10px;border-bottom:1px solid #eee;font-size:14px;text-align:left}
+    th{color:#6a6a70;font-weight:700}
+    tbody tr:hover{background:#f2f2f7}
+    .section-title{font-size:16px;font-weight:700;margin-bottom:12px;color:#1c1c1e}
+    .note{font-size:13px;color:#6a6a70;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="login-screen" class="login-card">
+      <h1>JM Super Admin</h1>
+      <p>별도 비밀번호로 로그인하여 전체 회사 데이터를 조회합니다.</p>
+      <label>
+        Password
+        <input type="password" id="admin-password" placeholder="Enter admin password">
+      </label>
+      <button onclick="Admin.login()">Login</button>
+      <div id="login-msg" class="message"></div>
+    </div>
+
+    <div id="dashboard-screen" class="hidden">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+          <div>
+            <h1>JM Super Admin Dashboard</h1>
+            <p class="subtitle">전체 회사 데이터를 실시간으로 조회하고, 리포트·투어·데일리 기록을 한 곳에서 확인합니다.</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button onclick="Admin.logout()">Logout</button>
+            <button class="csv-btn" onclick="exportAllCSV()">Export CSV</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="num" id="total-companies">-</div><div class="label">Companies</div></div>
+          <div class="stat"><div class="num" id="total-tours">-</div><div class="label">Tours</div></div>
+          <div class="stat"><div class="num" id="total-daily">-</div><div class="label">Daily Records</div></div>
+          <div class="stat"><div class="num" id="total-reports">-</div><div class="label">Reports</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Filters</h2>
+        <div class="controls">
+          <label>From Date<input type="date" id="from-date"></label>
+          <label>To Date<input type="date" id="to-date"></label>
+          <label>Company<select id="company-filter"><option value="">All Companies</option></select></label>
+          <label>Guide Email<select id="guide-filter"><option value="">All Guides</option></select></label>
+          <button onclick="loadAdminData()">Load Data</button>
+        </div>
+        <div class="note">전체 데이터 조회용 URL입니다. 이 페이지는 다른 앱에서 노출되지 않습니다.</div>
+      </div>
+
+      <div id="summary-section" class="card hidden">
+        <h2 class="section-title">Summary</h2>
+        <div class="stats">
+          <div class="stat"><div class="num" id="sum-report-amount">-</div><div class="label">Report Amount</div></div>
+          <div class="stat"><div class="num" id="sum-report-cost">-</div><div class="label">Report Cost</div></div>
+          <div class="stat"><div class="num" id="sum-report-margin">-</div><div class="label">Report Margin</div></div>
+          <div class="stat"><div class="num" id="sum-daily-revenue">-</div><div class="label">Daily Revenue</div></div>
+        </div>
+      </div>
+
+      <div id="data-section" class="hidden">
+        <div class="card">
+          <h2 class="section-title">Companies</h2>
+          <table>
+            <thead><tr><th>Company ID</th><th>Company Name</th><th>Guide Count</th><th>Reports</th><th>Tours</th></tr></thead>
+            <tbody id="companies-body"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Tours</h2>
+          <table>
+            <thead><tr><th>Tour ID</th><th>Company</th><th>Tour Name</th><th>Date</th><th>Status</th><th>Revenue</th></tr></thead>
+            <tbody id="tours-body"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Daily Records</h2>
+          <table>
+            <thead><tr><th>Record ID</th><th>Tour ID</th><th>Guide</th><th>Date</th><th>Guide Fee</th><th>Shopping</th><th>Total</th></tr></thead>
+            <tbody id="daily-body"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Reports</h2>
+          <table>
+            <thead><tr><th>Report ID</th><th>Company</th><th>Guide</th><th>Date</th><th>Amount</th><th>Cost</th><th>Margin</th></tr></thead>
+            <tbody id="reports-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://oybauzioqabopskxdaea.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB';
+const ADMIN_SECRET = 'JMsuper2026!';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let adminData = { companies: [], tours: [], dailies: [], reports: [] };
+
+const Admin = {
+  login() {
+    const pass = document.getElementById('admin-password').value.trim();
+    const msg = document.getElementById('login-msg');
+    msg.innerText = '';
+    if (!pass) { msg.innerText = '비밀번호를 입력하세요.'; return; }
+    if (pass !== ADMIN_SECRET) { msg.innerText = '비밀번호가 올바르지 않습니다.'; return; }
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    setDefaultDates();
+    populateCompanies();
+    populateGuides();
+    loadAdminData();
+  },
+  logout() {
+    document.getElementById('dashboard-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('admin-password').value = '';
+    document.getElementById('login-msg').innerText = '로그아웃되었습니다.';
+  }
+};
+
+function setDefaultDates() {
+  const to = document.getElementById('to-date');
+  const from = document.getElementById('from-date');
+  const today = new Date();
+  const before = new Date(); before.setDate(today.getDate() - 30);
+  to.value = today.toISOString().slice(0,10);
+  from.value = before.toISOString().slice(0,10);
+}
+
+async function populateCompanies() {
+  try {
+    let { data, error } = await sb.from('profiles').select('company_id, company_name').neq('company_id', null);
+    if (error) throw error;
+    const companies = {};
+    (data||[]).forEach(item => {
+      if (!item.company_id) return;
+      companies[item.company_id] = item.company_name || item.company_id;
+    });
+    const select = document.getElementById('company-filter');
+    select.innerHTML = '<option value="">All Companies</option>' + Object.entries(companies).map(([id,name]) => `<option value="${id}">${name}</option>`).join('');
+  } catch (err) {
+    console.warn('populateCompanies failed', err);
+  }
+}
+
+async function populateGuides() {
+  try {
+    let { data, error } = await sb.from('profiles').select('id, email').neq('id', null);
+    if (error) throw error;
+    const select = document.getElementById('guide-filter');
+    select.innerHTML = '<option value="">All Guides</option>' + (data||[]).map(g => `<option value="${g.id}">${g.email || g.id}</option>`).join('');
+  } catch (err) {
+    console.warn('populateGuides failed', err);
+  }
+}
+
+async function loadAdminData() {
+  try {
+    const from = document.getElementById('from-date').value;
+    const to = document.getElementById('to-date').value;
+    const company = document.getElementById('company-filter').value;
+    const guide = document.getElementById('guide-filter').value;
+
+    const companyFilter = company ? { company_id: company } : {};
+    const guideFilter = guide ? { guide_id: guide } : {};
+
+    const [companiesRes, toursRes, dailiesRes, reportsRes] = await Promise.all([
+      sb.from('profiles').select('company_id,company_name').neq('company_id', null),
+      sb.from('tours').select('*').order('scheduled_date', { ascending: false }),
+      sb.from('daily_records').select('*').order('record_date', { ascending: false }),
+      sb.from('reports').select('*').order('actual_end_time', { ascending: false })
+    ]);
+
+    if (companiesRes.error) throw companiesRes.error;
+    if (toursRes.error) throw toursRes.error;
+    if (dailiesRes.error) throw dailiesRes.error;
+    if (reportsRes.error) throw reportsRes.error;
+
+    adminData.companies = companiesRes.data || [];
+    adminData.tours = filterRecords(toursRes.data || [], from, to, companyFilter, guideFilter, 'scheduled_date');
+    adminData.dailies = filterRecords(dailiesRes.data || [], from, to, companyFilter, guideFilter, 'record_date');
+    adminData.reports = filterRecords(reportsRes.data || [], from, to, companyFilter, guideFilter, 'actual_end_time');
+
+    renderCompanies();
+    renderTours();
+    renderDailies();
+    renderReports();
+    renderSummary();
+
+    document.getElementById('summary-section').classList.remove('hidden');
+    document.getElementById('data-section').classList.remove('hidden');
+  } catch (err) {
+    console.error('loadAdminData failed', err);
+    alert('데이터 로드 실패: ' + err.message);
+  }
+}
+
+function filterRecords(records, from, to, companyFilter, guideFilter, dateField) {
+  return (records||[]).filter(item => {
+    const date = (item[dateField]||'').slice(0,10);
+    if (from && date < from) return false;
+    if (to && date > to) return false;
+    if (companyFilter.company_id && item.company_id !== companyFilter.company_id) return false;
+    if (guideFilter.guide_id && item.guide_id !== guideFilter.guide_id) return false;
+    return true;
+  });
+}
+
+function companyName(id) {
+  const found = adminData.companies.find(c => c.company_id === id);
+  return found ? found.company_name || id : id || '-';
+}
+
+function renderCompanies() {
+  const body = document.getElementById('companies-body');
+  const companyMap = {};
+  adminData.companies.forEach(c => {
+    if (!c.company_id) return;
+    companyMap[c.company_id] = { name: c.company_name || c.company_id, guides: new Set(), reports: 0, tours: 0 };
+  });
+  adminData.reports.forEach(r => {
+    if (!r.company_id) return;
+    companyMap[r.company_id] = companyMap[r.company_id] || { name: r.company_id, guides: new Set(), reports: 0, tours: 0 };
+    companyMap[r.company_id].reports += 1;
+    if (r.guide_id) companyMap[r.company_id].guides.add(r.guide_id);
+  });
+  adminData.tours.forEach(t => {
+    if (!t.company_id) return;
+    companyMap[t.company_id] = companyMap[t.company_id] || { name: t.company_id, guides: new Set(), reports: 0, tours: 0 };
+    companyMap[t.company_id].tours += 1;
+  });
+  body.innerHTML = Object.entries(companyMap).map(([id, item]) =>
+    `<tr><td>${id}</td><td>${item.name}</td><td>${item.guides.size}</td><td>${item.reports}</td><td>${item.tours}</td></tr>`
+  ).join('') || '<tr><td colspan="5" class="note">조회된 회사 데이터가 없습니다.</td></tr>';
+}
+
+function renderTours() {
+  const body = document.getElementById('tours-body');
+  body.innerHTML = (adminData.tours||[]).map(t =>
+    `<tr><td>${t.id||'-'}</td><td>${companyName(t.company_id)}</td><td>${t.tour_name||'-'}</td><td>${(t.scheduled_date||'').slice(0,10)||'-'}</td><td>${t.status||'-'}</td><td>${Number(t.total_revenue||0).toLocaleString()}</td></tr>`
+  ).join('') || '<tr><td colspan="6" class="note">조회된 투어 데이터가 없습니다.</td></tr>';
+}
+
+function renderDailies() {
+  const body = document.getElementById('daily-body');
+  body.innerHTML = (adminData.dailies||[]).map(d =>
+    `<tr><td>${d.id||'-'}</td><td>${d.tour_id||'-'}</td><td>${d.guide_id||'-'}</td><td>${(d.record_date||'').slice(0,10)||'-'}</td><td>${Number(d.guide_fee||0).toLocaleString()}</td><td>${Number(d.shopping_sales||0).toLocaleString()}</td><td>${Number(d.total_revenue||0).toLocaleString()}</td></tr>`
+  ).join('') || '<tr><td colspan="7" class="note">조회된 일일 기록이 없습니다.</td></tr>';
+}
+
+function renderReports() {
+  const body = document.getElementById('reports-body');
+  body.innerHTML = (adminData.reports||[]).map(r => {
+    const amount = Number(r.amount||0);
+    const cost = Number(r.cost||0);
+    const margin = amount - cost;
+    return `<tr><td>${r.id||'-'}</td><td>${companyName(r.company_id)}</td><td>${r.guide_id||'-'}</td><td>${(r.actual_end_time||'').slice(0,10)||'-'}</td><td>${amount.toLocaleString()}</td><td>${cost.toLocaleString()}</td><td>${margin.toLocaleString()}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" class="note">조회된 리포트 데이터가 없습니다.</td></tr>';
+}
+
+function renderSummary() {
+  const reports = adminData.reports || [];
+  const amount = reports.reduce((sum,r)=>sum + Number(r.amount||0),0);
+  const cost = reports.reduce((sum,r)=>sum + Number(r.cost||0),0);
+  const margin = amount - cost;
+  const dailyRevenue = (adminData.dailies||[]).reduce((sum,d)=>sum + Number(d.total_revenue||0),0);
+  document.getElementById('sum-report-amount').innerText = amount.toLocaleString();
+  document.getElementById('sum-report-cost').innerText = cost.toLocaleString();
+  document.getElementById('sum-report-margin').innerText = margin.toLocaleString();
+  document.getElementById('sum-daily-revenue').innerText = dailyRevenue.toLocaleString();
+  document.getElementById('total-companies').innerText = new Set(adminData.companies.map(c=>c.company_id)).size || '-';
+  document.getElementById('total-tours').innerText = (adminData.tours||[]).length || '-';
+  document.getElementById('total-daily').innerText = (adminData.dailies||[]).length || '-';
+  document.getElementById('total-reports').innerText = (adminData.reports||[]).length || '-';
+}
+
+function exportAllCSV() {
+  const rows = [['Type','ID','Company','Guide','Date','Value1','Value2','Value3','Status']];
+  (adminData.companies||[]).forEach(c=>rows.push(['Company',c.company_id,c.company_name,'','','','','','']));
+  (adminData.tours||[]).forEach(t=>rows.push(['Tour',t.id,companyName(t.company_id),t.guide_id,(t.scheduled_date||'').slice(0,10),t.total_revenue,t.status,'','']));
+  (adminData.dailies||[]).forEach(d=>rows.push(['Daily',d.id,'',d.guide_id,(d.record_date||'').slice(0,10),d.guide_fee,d.shopping_sales,d.total_revenue,'']));
+  (adminData.reports||[]).forEach(r=>rows.push(['Report',r.id,companyName(r.company_id),r.guide_id,(r.actual_end_time||'').slice(0,10),r.amount,r.cost,r.amount - r.cost,'']));
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'jm-super-admin-data.csv'; a.click();
+}
+</script>
+</body>
+</html>
