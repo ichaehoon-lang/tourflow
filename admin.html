@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Dashboard - TourFlow</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{background:#f2f2f7}
+    body{font-family:'SF Pro Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#1c1c1e;padding:22px}
+    .container{max-width:980px;margin:0 auto}
+    .card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,0.04)}
+    h1{font-size:20px;margin-bottom:6px}
+    .subtitle{color:#6a6a70;font-size:14px;margin-bottom:12px}
+    .stats{display:flex;gap:12px}
+    .stat{flex:1;background:#f7f7f7;border-radius:12px;padding:12px;text-align:center;border:1px solid #e9e9ec}
+    .stat .num{font-weight:800;font-size:18px;color:#1c1c1e}
+    .stat .label{font-size:12px;color:#6a6a70;margin-top:6px}
+    .controls{display:flex;gap:10px;align-items:center;margin:12px 0}
+    input[type=date],select{padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#f7f7f7}
+    button{padding:10px 12px;border-radius:12px;border:none;background:#1c1c1e;color:#fff;font-weight:700;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px 8px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+    th{color:#6a6a70;font-weight:700}
+    .small{font-size:13px;color:#6a6a70}
+    .muted{color:#6a6a70}
+    .csv-btn{background:#f2f2f7;color:#1c1c1e;border:1px solid #d1d1d6}
+    .empty{padding:24px;text-align:center;color:#6a6a70}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>관리자 대시보드</h1>
+      <div class="subtitle">주/월 합계와 마진을 빠르게 확인하세요</div>
+      <div class="stats">
+        <div class="stat"><div class="num" id="week-total">-</div><div class="label">Week Total</div></div>
+        <div class="stat"><div class="num" id="month-total">-</div><div class="label">Month Total</div></div>
+        <div class="stat"><div class="num" id="margin-total">-</div><div class="label">Margin</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <label class="small">From <input type="date" id="from-date"></label>
+        <label class="small">To <input type="date" id="to-date"></label>
+        <select id="guide-filter">
+          <option value="">All Guides</option>
+        </select>
+        <button onclick="loadReports()">Refresh</button>
+        <button class="csv-btn" onclick="exportCSV()">Export CSV</button>
+      </div>
+
+      <div id="reports-area">
+        <table id="reports-table">
+          <thead>
+            <tr><th>Date</th><th>Guide</th><th class="muted">Amount</th><th class="muted">Cost</th><th>Margin</th><th>Receipts</th></tr>
+          </thead>
+          <tbody id="reports-body">
+          </tbody>
+        </table>
+        <div id="reports-empty" class="empty" style="display:none">No reports found for the selected range.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://oybauzioqabopskxdaea.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function iso(date){return date.toISOString().slice(0,10)}
+function parseNum(v){return typeof v==='number'?v: (v?Number(v):0)}
+
+async function loadGuides(){
+  try{
+    const { data } = await sb.from('profiles').select('id, email').order('email');
+    const sel = document.getElementById('guide-filter');
+    if(data) data.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.email||g.id;sel.appendChild(o)});
+  }catch(e){console.warn('loadGuides failed',e)}
+}
+
+async function loadReports(){
+  const from = document.getElementById('from-date').value;
+  const to = document.getElementById('to-date').value;
+  const guide = document.getElementById('guide-filter').value;
+  const tbody = document.getElementById('reports-body');
+  const empty = document.getElementById('reports-empty');
+  tbody.innerHTML=''; empty.style.display='none';
+  try{
+    let q = sb.from('reports').select('id,guide_id,actual_end_time,receipt_urls,notes,amount,cost');
+    if(from) q = q.gte('actual_end_time', from);
+    if(to) q = q.lte('actual_end_time', to);
+    if(guide) q = q.eq('guide_id', guide);
+    const { data, error } = await q.order('actual_end_time',{ascending:false});
+    if(error) throw error;
+    if(!data || data.length===0){ empty.style.display='block'; updateStats([]); return; }
+    let weekTotal=0, monthTotal=0, marginTotal=0;
+    const now = new Date(); const monthStart = new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
+    const weekStart = (function(){const d=new Date(); const day=d.getDay(); const diff=d.getDate() - day + (day===0?-6:1); d.setDate(diff); return d.toISOString().slice(0,10)})();
+    data.forEach(r=>{
+      const date = (r.actual_end_time||'').slice(0,10) || '';
+      const amount = parseNum(r.amount);
+      const cost = parseNum(r.cost);
+      const margin = amount - cost;
+      weekTotal += (date>=weekStart)?amount:0;
+      monthTotal += (date>=monthStart)?amount:0;
+      marginTotal += margin;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${date}</td><td class=\"small\">${r.guide_id||''}</td><td class=\"muted\">${amount.toLocaleString()}</td><td class=\"muted\">${cost.toLocaleString()}</td><td>${margin.toLocaleString()}</td><td>${(r.receipt_urls? r.receipt_urls.length:0)}</td>`;
+      tbody.appendChild(tr);
+    });
+    updateStats([weekTotal, monthTotal, marginTotal]);
+  }catch(err){console.error('loadReports',err); empty.style.display='block'}
+}
+
+function updateStats(vals){
+  const wk = vals[0]||0; const mo = vals[1]||0; const mg = vals[2]||0;
+  document.getElementById('week-total').innerText = wk? wk.toLocaleString() : '-';
+  document.getElementById('month-total').innerText = mo? mo.toLocaleString() : '-';
+  document.getElementById('margin-total').innerText = mg? mg.toLocaleString() : '-';
+}
+
+function exportCSV(){
+  const rows = [['Date','Guide','Amount','Cost','Margin','Receipts']];
+  document.querySelectorAll('#reports-body tr').forEach(tr=>{const cols=Array.from(tr.children).map(td=>td.innerText);rows.push(cols)});
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='reports.csv'; a.click();
+}
+
+// init default dates and load
+document.getElementById('to-date').value = iso(new Date());
+const d0 = new Date(); d0.setDate(d0.getDate()-7); document.getElementById('from-date').value = iso(d0);
+loadGuides(); loadReports();
+</script>
+</body>
+</html>
