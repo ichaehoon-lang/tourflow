@@ -7,239 +7,79 @@
 <title>Tour Quote App</title>
 <style>
 * { box-sizing: border-box; }
+html { background: #f2f2f7; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    padding: 16px;
-    padding-bottom: 90px;
+    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 20px;
+    padding-bottom: 110px;
     margin: 0;
-    background: #f5f5f5;
+    background: #fff;
+    color: #1c1c1e;
     -webkit-tap-highlight-color: transparent;
 }
-h2 { margin-top: 0; font-size: 1.4em; }
+h2 { margin-top: 0; font-size: 20px; font-weight:700; color:#1c1c1e; }
 .sticky-buttons {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    padding: 8px 12px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.12);
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);
+    max-width: 900px;
+    background-color: transparent;
+    padding: 6px;
     display: flex;
-    justify-content: space-around;
+    gap: 10px;
     z-index: 1000;
-    gap: 6px;
 }
-.sticky-buttons button {
-    flex: 1;
-}
+.sticky-buttons button { flex: 1; border-radius: 14px; background:#1c1c1e; color:#fff; }
 input[type="text"], input[type="number"], input[type="date"], textarea {
-    margin: 6px 0;
-    padding: 14px 12px;
+    margin: 8px 0;
+    padding: 12px 14px;
     width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    background: #fff;
+    border: 1px solid #d1d1d6;
+    border-radius: 12px;
+    font-size: 15px;
+    background: #f7f7f7;
     -webkit-appearance: none;
     font-family: inherit;
 }
-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-input:focus, textarea:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
-}
-input[type="checkbox"] {
-    margin: 6px 8px 6px 0;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff;
-    vertical-align: middle;
-}
-input[type="checkbox"]:checked {
-    background: #007bff;
-    border-color: #007bff;
-}
-button {
-    padding: 12px 16px;
-    cursor: pointer;
-    min-height: 44px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    touch-action: manipulation;
-    transition: opacity 0.15s, transform 0.1s;
-}
-button:active {
-    opacity: 0.8;
-    transform: scale(0.97);
-}
-button:disabled {
-    background-color: #ccc;
-    color: #888;
-    cursor: not-allowed;
-    opacity: 0.6;
-    transform: none;
-}
-button.btn-secondary {
-    background-color: #17a2b8;
-}
-button.btn-secondary:active {
-    background-color: #138496;
-}
-button.btn-secondary:disabled {
-    background-color: #ccc;
-    color: #888;
-}
-button.btn-danger {
-    background-color: #dc3545;
-}
-button.btn-danger:active {
-    background-color: #c82333;
-}
-.form-section {
-    background: #fff;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    margin-bottom: 16px;
-}
-details {
-    background: #fff;
-    padding: 0;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    margin-bottom: 12px;
-    overflow: hidden;
-}
-#quote_list {
-    margin-top: 16px;
-    padding-bottom: 20px;
-}
-details summary {
-    padding: 16px;
-    cursor: pointer;
-    font-weight: 600;
-    color: #333;
-    background: #f9f9f9;
-    border-bottom: 1px solid #eee;
-    user-select: none;
-    -webkit-user-select: none;
-}
-details summary:hover {
-    background: #f0f0f0;
-}
-details[open] summary {
-    border-bottom: 1px solid #ddd;
-}
-details > div {
-    padding: 16px;
-}
-.checkbox-row {
-    display: flex;
-    align-items: center;
-    margin: 12px 0;
-}
-.checkbox-row label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 16px;
-}
-.checkbox-row input[type="checkbox"] {
-    margin: 0 8px 0 0;
-}
-.box {
-    border: 1px solid #e0e0e0;
-    border-left: 5px solid;
-    padding: 14px;
-    margin: 12px 0;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    background-color: #fff;
-}
-.box.good { border-left-color: #28a745; }
-.box.risk { border-left-color: #ffc107; }
-.box.bad { border-left-color: #dc3545; }
-.box h4 { margin: 0 0 8px 0; color: #333; font-size: 1.1em; }
-.box p { margin: 4px 0; font-size: 0.9em; color: #555; }
-.box .quote-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-.box .quote-actions button {
-    flex: 1;
-    min-width: 70px;
-    padding: 10px 12px;
-    min-height: 40px;
-    font-size: 13px;
-}
-.good { color: #28a745; font-weight: bold; }
-.risk { color: #e67e00; font-weight: bold; }
-.bad { color: #dc3545; font-weight: bold; }
-.editing-highlight {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 12px rgba(0, 123, 255, 0.3);
-}
-.editing-banner {
-    background: #007bff;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-}
-.editing-banner.show { display: flex; }
-#loading-indicator {
-    text-align: center;
-    padding: 20px;
-    font-size: 1em;
-    color: #666;
-    display: none;
-}
-#message {
-    padding: 8px 0;
-    font-size: 0.9em;
-    min-height: 20px;
-}
-.msg-success { color: #28a745; }
-.msg-error { color: #dc3545; }
-.msg-info { color: #007bff; }
-#result {
-    background: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 12px 0;
-    font-size: 0.95em;
-    line-height: 1.6;
-    display: none;
-}
-#result.show { display: block; }
+textarea { resize: vertical; min-height: 90px; }
+input:focus, textarea:focus { outline: none; border-color: #8e8e93; box-shadow: 0 0 0 4px rgba(60,60,67,0.06); }
+input[type="checkbox"] { margin: 6px 8px 6px 0; width: 18px; height: 18px; cursor: pointer; }
+button { padding: 12px 14px; cursor: pointer; min-height: 46px; background-color: #1c1c1e; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight:700; }
+button:active { opacity: 0.88; transform: none; }
+button:disabled { background-color: #d1d1d6; color:#8e8e93; cursor:not-allowed; }
+button.btn-secondary { background:#f2f2f7; color:#1c1c1e; border:1px solid #d1d1d6; }
+.form-section { background: #fff; padding: 0; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); overflow:hidden; }
+details { background: transparent; margin-bottom: 12px; border-radius: 12px; overflow: hidden; }
+#quote_list { margin-top: 16px; padding-bottom: 20px; }
+details summary { padding: 14px 16px; cursor: pointer; font-weight: 700; color:#1c1c1e; background:#fff; border-bottom:1px solid #e9e9ec; }
+details summary:hover { background:#fafafa; }
+details[open] summary { border-bottom:1px solid #e0e0e0; }
+details > div { padding: 12px 16px 18px; background:#fff; }
+.checkbox-row { display:flex; align-items:center; margin:12px 0; }
+.checkbox-row label { display:flex; align-items:center; cursor:pointer; font-size:15px; }
+.box { border:1px solid #e9e9ec; padding:12px; margin:12px 0; border-radius:12px; background:#fff; }
+.box h4 { margin:0 0 8px 0; color:#1c1c1e; font-size:16px; }
+.box p { margin:4px 0; font-size:14px; color:#6a6a70; }
+.box .quote-actions { margin-top:10px; display:flex; gap:8px; }
+.good { color:#1c1c1e; font-weight:700; }
+.risk { color:#6a6a70; font-weight:700; }
+.bad { color:#6a6a70; font-weight:700; }
+.editing-highlight { box-shadow:0 6px 18px rgba(0,0,0,0.06); border-radius:12px; }
+.editing-banner { background:#1c1c1e; color:#fff; padding:10px 12px; border-radius:10px; margin-bottom:12px; display:none; align-items:center; justify-content:space-between; }
+.editing-banner.show { display:flex; }
+#loading-indicator { text-align:center; padding:20px; font-size:1em; color:#6a6a70; display:none; }
+#message { padding:8px 0; font-size:0.95em; min-height:20px; color:#6a6a70; }
+.msg-success { color:#1c1c1e; }
+.msg-error { color:#6a6a70; }
+.msg-info { color:#6a6a70; }
+#result { background:#fff; padding:12px; border-radius:12px; margin:12px 0; font-size:0.95em; line-height:1.6; display:none; }
+#result.show { display:block; }
 @media (min-width: 768px) {
-    body { padding: 30px; padding-bottom: 90px; max-width: 900px; margin: 0 auto; }
-    input[type="text"], input[type="number"], input[type="date"], textarea {
-        width: 48%;
-        display: inline-block;
-        margin-right: 2%;
-    }
-    .sticky-buttons {
-        max-width: 900px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 12px 12px 0 0;
-        padding: 12px 20px;
-    }
+    body { padding: 30px; padding-bottom: 110px; max-width: 980px; margin: 0 auto; }
+    input[type="text"], input[type="number"], input[type="date"], textarea { width: 48%; display:inline-block; margin-right:2%; }
+    .sticky-buttons { width: calc(100% - 200px); left:50%; transform:translateX(-50%); }
 }
 </style>
 </head>
@@ -309,7 +149,7 @@ details > div {
         <div>
             <div id="hotel_rows"></div>
             <p id="hotel_subtotal" style="font-weight:600; margin-top:8px; color:#333;">Subtotal: $0.00</p>
-            <button type="button" onclick="addHotelRow()" style="background:#28a745;">+ Add Hotel</button>
+            <button type="button" onclick="addHotelRow()" class="btn-secondary">+ Add Hotel</button>
         </div>
     </details>
 
