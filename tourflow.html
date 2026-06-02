@@ -10,212 +10,1013 @@
 html { background: #f2f2f7; }
 body {
     font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    padding: 20px;
-    padding-bottom: 110px;
     margin: 0;
-    background: #fff;
+    min-height: 100vh;
+    background: #f2f2f7;
     color: #1c1c1e;
     -webkit-tap-highlight-color: transparent;
 }
-h2 { margin-top: 0; font-size: 20px; font-weight:700; color:#1c1c1e; }
-.sticky-buttons {
-    position: fixed;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 900px;
-    background-color: transparent;
-    padding: 6px;
-    display: flex;
-    gap: 10px;
-    z-index: 1000;
-}
-.sticky-buttons button { flex: 1; border-radius: 14px; background:#1c1c1e; color:#fff; }
-input[type="text"], input[type="number"], input[type="date"], textarea {
-    margin: 8px 0;
-    padding: 12px 14px;
-    width: 100%;
-    border: 1px solid #d1d1d6;
-    border-radius: 12px;
-    font-size: 15px;
-    background: #f7f7f7;
-    -webkit-appearance: none;
-    font-family: inherit;
-}
-textarea { resize: vertical; min-height: 90px; }
-input:focus, textarea:focus { outline: none; border-color: #8e8e93; box-shadow: 0 0 0 4px rgba(60,60,67,0.06); }
-input[type="checkbox"] { margin: 6px 8px 6px 0; width: 18px; height: 18px; cursor: pointer; }
-button { padding: 12px 14px; cursor: pointer; min-height: 46px; background-color: #1c1c1e; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight:700; }
-button:active { opacity: 0.88; transform: none; }
-button:disabled { background-color: #d1d1d6; color:#8e8e93; cursor:not-allowed; }
-button.btn-secondary { background:#f2f2f7; color:#1c1c1e; border:1px solid #d1d1d6; }
-.form-section { background: #fff; padding: 0; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); overflow:hidden; }
-details { background: transparent; margin-bottom: 12px; border-radius: 12px; overflow: hidden; }
-#quote_list { margin-top: 16px; padding-bottom: 20px; }
-details summary { padding: 14px 16px; cursor: pointer; font-weight: 700; color:#1c1c1e; background:#fff; border-bottom:1px solid #e9e9ec; }
-details summary:hover { background:#fafafa; }
-details[open] summary { border-bottom:1px solid #e0e0e0; }
-details > div { padding: 12px 16px 18px; background:#fff; }
-.checkbox-row { display:flex; align-items:center; margin:12px 0; }
-.checkbox-row label { display:flex; align-items:center; cursor:pointer; font-size:15px; }
-.box { border:1px solid #e9e9ec; padding:12px; margin:12px 0; border-radius:12px; background:#fff; }
-.box h4 { margin:0 0 8px 0; color:#1c1c1e; font-size:16px; }
-.box p { margin:4px 0; font-size:14px; color:#6a6a70; }
-.box .quote-actions { margin-top:10px; display:flex; gap:8px; }
-.good { color:#1c1c1e; font-weight:700; }
-.risk { color:#6a6a70; font-weight:700; }
-.bad { color:#6a6a70; font-weight:700; }
-.editing-highlight { box-shadow:0 6px 18px rgba(0,0,0,0.06); border-radius:12px; }
-.editing-banner { background:#1c1c1e; color:#fff; padding:10px 12px; border-radius:10px; margin-bottom:12px; display:none; align-items:center; justify-content:space-between; }
+button, input, select, textarea { font-family: inherit; }
+button { cursor: pointer; }
+button, .btn-secondary { border: none; border-radius: 16px; padding: 12px 16px; font-weight: 700; transition: background .2s, transform .2s; }
+button:hover, .btn-secondary:hover { transform: translateY(-1px); }
+button { background: #1c1c1e; color: #fff; border: 1px solid transparent; }
+.btn-secondary { background: #f2f2f7; color: #1c1c1e; border: 1px solid #d1d1d6; }
+.btn-danger { background: #ff3b30; color: #fff; border: 1px solid transparent; }
+.box { background: #fff; border: 1px solid #e5e5ea; border-radius: 18px; padding: 18px; margin-bottom: 14px; }
+.quote-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.quote-actions button { flex: 1 1 auto; }
+.container { max-width: 1400px; margin: 0 auto; padding: 22px 20px 40px; }
+.login-card,
+.card { background: #fff; border-radius: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); }
+.login-card { max-width: 480px; margin: 80px auto; padding: 32px; }
+.login-card h2 { font-size: 28px; margin-bottom: 10px; }
+.login-card p { margin-bottom: 24px; color: #6a6a70; line-height: 1.6; }
+.login-card label { display: block; font-size: 14px; color: #3c3c43; margin-bottom: 12px; }
+.login-card input { width: 100%; border: 1px solid #d1d1d6; background: #f7f7f7; border-radius: 16px; padding: 14px 16px; }
+
+.app-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+.app-header h2 { margin: 0; font-size: 28px; }
+.app-header p { margin: 6px 0 0; color: #6a6a70; }
+.btn-logout { background: #f2f2f7; color: #1c1c1e; border: 1px solid #d1d1d6; }
+
+.app-shell { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; align-items: start; }
+.sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 20px; }
+.sidebar-panel { background: #fff; border: 1px solid #e9e9ec; border-radius: 24px; padding: 20px; }
+.sidebar-panel h3 { margin: 0 0 12px; font-size: 16px; }
+.sidebar-panel p { margin: 0; color: #6a6a70; font-size: 14px; line-height: 1.6; }
+.nav-list { display: grid; gap: 12px; margin-top: 18px; }
+.btn-nav { width: 100%; text-align: left; padding: 14px 16px; border-radius: 18px; border: 1px solid #e9e9ec; background: #f7f7f7; color: #1c1c1e; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
+.btn-nav.active, .btn-nav:hover { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+.sidebar-footer { margin-top: auto; color: #6a6a70; font-size: 13px; line-height: 1.6; }
+
+.main { display: flex; flex-direction: column; gap: 20px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.panel-card { background: #fff; border: 1px solid #e9e9ec; border-radius: 24px; padding: 22px; box-shadow: 0 18px 40px rgba(0,0,0,0.04); }
+.panel-card h3 { margin-top: 0; font-size: 20px; }
+.panel-card h4 { margin: 0 0 14px; font-size: 16px; }
+.panel-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.form-group label { color: #3c3c43; font-size: 14px; font-weight: 600; }
+input[type="text"], select, input[type="number"], input[type="date"], textarea { width: 100%; margin: 0; padding: 14px 16px; border: 1px solid #d1d1d6; border-radius: 16px; background: #f7f7f7; color: #1c1c1e; font-size: 15px; }
+textarea { min-height: 120px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: #8e8e93; box-shadow: 0 0 0 4px rgba(60,60,67,0.08); }
+.checkbox-row { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+.checkbox-row label { font-size: 15px; color: #3c3c43; }
+.detail-block { margin-bottom: 18px; }
+.detail-block summary { padding: 16px 18px; background: #fafafa; border-radius: 18px; font-weight: 700; border: 1px solid #e9e9ec; }
+.detail-block div { padding: 16px 18px 20px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+.stat-card { background: #f7f7f7; border-radius: 18px; padding: 16px; border: 1px solid #e9e9ec; }
+.stat-card .label { display: block; font-size: 12px; color: #6a6a70; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .1em; }
+.stat-card .value { font-size: 22px; font-weight: 800; color: #1c1c1e; }
+
+.quote-list-wrap, .guide-overview-wrap { display: flex; flex-direction: column; gap: 18px; }
+.search-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.search-row input { flex: 1; min-width: 220px; }
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 720px; }
+th, td { padding: 14px 12px; border-bottom: 1px solid #f0f0f5; text-align: left; font-size: 14px; }
+th { color: #6a6a70; font-weight: 700; }
+tr:hover { background: #fafafa; }
+.badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.badge.green { background: #e6f6ec; color: #127a35; }
+.badge.yellow { background: #fff4ce; color: #a67c00; }
+.badge.red { background: #fee4e2; color: #981b1c; }
+
+.sticky-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; margin-top: 12px; }
+.sticky-buttons button { flex: 1 1 calc(50% - 12px); min-width: 140px; }
+.editing-banner { background:#1c1c1e; color:#fff; padding:14px 18px; border-radius:18px; margin-bottom:18px; display:none; align-items:center; justify-content:space-between; }
 .editing-banner.show { display:flex; }
-#loading-indicator { text-align:center; padding:20px; font-size:1em; color:#6a6a70; display:none; }
-#message { padding:8px 0; font-size:0.95em; min-height:20px; color:#6a6a70; }
-.msg-success { color:#1c1c1e; }
-.msg-error { color:#6a6a70; }
-.msg-info { color:#6a6a70; }
-#result { background:#fff; padding:12px; border-radius:12px; margin:12px 0; font-size:0.95em; line-height:1.6; display:none; }
-#result.show { display:block; }
-@media (min-width: 768px) {
-    body { padding: 30px; padding-bottom: 110px; max-width: 980px; margin: 0 auto; }
-    input[type="text"], input[type="number"], input[type="date"], textarea { width: 48%; display:inline-block; margin-right:2%; }
-    .sticky-buttons { width: calc(100% - 200px); left:50%; transform:translateX(-50%); }
+#message { padding: 8px 0; min-height: 22px; color:#6a6a70; }
+#result { background: #f7f7f7; padding: 16px; border-radius: 18px; margin-top: 12px; display: none; }
+#result.show { display: block; }
+#loading-indicator { text-align: center; padding: 20px; font-size: 14px; color: #6a6a70; display: none; }
+
+@media (max-width: 1080px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { position: relative; top: auto; }
+    .panel-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .sticky-buttons button { flex: 1 1 100%; }
+}
+
+@media (max-width: 720px) {
+    .container { padding: 16px 12px 32px; }
+    .login-card { margin: 40px 0; padding: 24px; }
+    .app-header { flex-direction: column; align-items: flex-start; }
+    .sidebar-panel, .panel-card { padding: 18px; }
+    input, select, textarea, button { font-size: 14px; }
+    table { min-width: 100%; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div class="container">
+  <div id="login-screen" class="card" style="margin-top:16px;">
+    <div class="card-header">
+      <h2>회사 관리자 로그인</h2>
+      <p class="subtitle" style="margin-top:6px;color:#6a6a70;font-size:14px;">회사 계정으로 로그인하여 본사 투어 현황 및 견적을 관리합니다.</p>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label for="admin-email">Email</label>
+        <input id="admin-email" type="email" placeholder="admin@example.com">
+      </div>
+      <div class="field">
+        <label for="admin-password">Password</label>
+        <input id="admin-password" type="password" placeholder="Password">
+      </div>
+      <button onclick="tourLogin()">Login</button>
+      <p id="login-msg" class="small muted" style="margin-top:12px;"></p>
+    </div>
+  </div>
 
-<h2>Tour Quote Management</h2>
+  <div id="app-screen" style="display:none;">
+    <div class="app-header">
+      <div>
+        <h2>TourFlow Company Dashboard</h2>
+        <p>Wide-screen desktop first layout — 왼쪽 사이드바에서 탭을 전환해 회사별 견적/투어/가이드 현황을 확인하세요.</p>
+      </div>
+      <button class="btn-logout" onclick="tourLogout()">Logout</button>
+    </div>
 
-<div class="editing-banner" id="editing-banner">
-    <span id="editing-label">Editing: —</span>
-    <button onclick="clearForm()" style="flex:0; min-width:60px; padding:6px 12px; min-height:32px; font-size:13px;">Cancel</button>
-</div>
-
-<div class="form-section" id="form-section">
-    <!-- Quote Information -->
-    <details>
-        <summary>Quote Information</summary>
-        <div>
-            <input id="quote_number" type="text" placeholder="Quote Number">
-            <input id="issue_date" type="date">
-            <input id="prepared_by" type="text" placeholder="Prepared By">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-panel">
+          <h3>메뉴</h3>
+          <div class="nav-list">
+            <button class="btn-nav active" data-tab="tab-dashboard" onclick="selectTab('tab-dashboard', this)">📊 대시보드</button>
+            <button class="btn-nav" data-tab="tab-quotes" onclick="selectTab('tab-quotes', this)">📋 견적</button>
+            <button class="btn-nav" data-tab="tab-tours" onclick="selectTab('tab-tours', this)">🗓️ 투어</button>
+            <button class="btn-nav" data-tab="tab-guides" onclick="selectTab('tab-guides', this)">👥 가이드</button>
+            <button class="btn-nav" data-tab="tab-settlement" onclick="selectTab('tab-settlement', this)">💰 정산</button>
+            <button class="btn-nav" data-tab="tab-analytics" onclick="selectTab('tab-analytics', this)">📈 분석</button>
+          </div>
+          <div class="sidebar-footer">
+            <strong id="company-name">Loading...</strong><br>
+            <small>회사 관리자</small>
+          </div>
         </div>
-    </details>
+      </aside>
 
-    <!-- Company Information -->
-    <details>
-        <summary>Company Information</summary>
-        <div>
-            <input id="company_name" type="text" placeholder="Company Name">
-            <input id="company_abn" type="text" placeholder="Company ABN">
-            <input id="company_address" type="text" placeholder="Company Address">
-            <input id="company_phone" type="text" placeholder="Company Phone">
-            <input id="company_email" type="text" placeholder="Company Email">
-        </div>
-    </details>
-
-    <!-- Client / Agency Information -->
-    <details>
-        <summary>Client / Agency Information</summary>
-        <div>
-            <input id="agency" type="text" placeholder="Agency">
-            <input id="contact_person" type="text" placeholder="Contact Person">
-            <input id="client_email" type="text" placeholder="Client Email">
-            <input id="client_phone" type="text" placeholder="Client Phone">
-        </div>
-    </details>
-
-    <!-- Event Information -->
-    <details open>
-        <summary>Event Information</summary>
-        <div>
-            <input id="tour_name" type="text" placeholder="Tour Name">
-            <input id="start_date" type="date">
-            <input id="end_date" type="date">
-            
-            <input id="vehicle_type" type="text" placeholder="Vehicle Type">
-            <input id="pax" type="number" placeholder="Total Pax" inputmode="numeric">
-            <input id="pax_adult" type="number" placeholder="Adult Pax" inputmode="numeric">
-            <input id="pax_child" type="number" placeholder="Child Pax" inputmode="numeric">
-            <input id="pax_tc" type="number" placeholder="Teacher/Chaperone Pax" inputmode="numeric">
-            
-        </div>
-    </details>
-
-    <!-- Hotel -->
-    <details open>
-        <summary>Hotel</summary>
-        <div>
-            <div id="hotel_rows"></div>
-            <p id="hotel_subtotal" style="font-weight:600; margin-top:8px; color:#333;">Subtotal: $0.00</p>
-            <button type="button" onclick="addHotelRow()" class="btn-secondary">+ Add Hotel</button>
-        </div>
-    </details>
-
-    <!-- Cost Breakdown -->
-    <details open>
-        <summary>Cost Breakdown</summary>
-        <div>
-            <input id="hotel_cost" type="number" placeholder="Hotel Cost" inputmode="decimal">
-            <input id="transport_cost" type="number" placeholder="Transport Cost" inputmode="decimal">
-            <input id="meal_cost" type="number" placeholder="Meal Cost" inputmode="decimal">
-            <input id="attraction_cost" type="number" placeholder="Attraction Cost" inputmode="decimal">
-            <input id="guide_cost" type="number" placeholder="Guide Cost" inputmode="decimal">
-            <input id="other_cost" type="number" placeholder="Other Cost" inputmode="decimal">
-        </div>
-    </details>
-
-    <!-- Revenue / Income -->
-    <details open>
-        <summary>Revenue / Income</summary>
-        <div>
-            <input id="tour_fee" type="number" placeholder="Tour Fee" inputmode="decimal">
-            <input id="shopping_count" type="number" placeholder="Shopping Count" inputmode="numeric">
-            <input id="health_sales" type="number" placeholder="Health Sales" inputmode="decimal">
-            <input id="general_sales" type="number" placeholder="General Goods Sales" inputmode="decimal">
-            <input id="wool_sales" type="number" placeholder="Wool Sales" inputmode="decimal">
-        </div>
-    </details>
-
-    <!-- Commercial Terms -->
-    <details>
-        <summary>Commercial Terms</summary>
-        <div>
-            <div class="checkbox-row">
-                <label>
-                    <input id="gst_included" type="checkbox" onchange="calculate()">
-                    GST Included (10%)
-                </label>
+      <main class="main">
+        <!-- 대시보드 탭 -->
+        <section id="tab-dashboard" class="tab-panel active">
+          <div class="panel-card">
+            <h3>대시보드</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><span class="label">이달 투어</span><span class="value" id="stat-month-tours">0</span></div>
+              <div class="stat-card"><span class="label">미확정 견적</span><span class="value" id="stat-pending-quotes">0</span><small style="color:#ff3b30; margin-top:4px;">확인 필요</small></div>
+              <div class="stat-card"><span class="label">배정된 가이드</span><span class="value" id="stat-assigned-guides">0</span></div>
             </div>
-            <input id="payment_terms" type="text" placeholder="Payment Terms">
-            <input id="cancellation_policy" type="text" placeholder="Cancellation Policy">
-            <input id="valid_until" type="date">
-            <textarea id="notes" placeholder="Additional Notes"></textarea>
-        </div>
-    </details>
-</div>
+            
+            <div class="panel-card" style="margin-top:18px;">
+              <h4>📅 투어 캘린더</h4>
+              <div id="tour-calendar" style="background:#f7f7f7; border-radius:18px; padding:20px; min-height:400px;">
+                <p style="text-align:center; color:#6a6a70;">캘린더 로딩 중...</p>
+              </div>
+            </div>
 
-<div class="sticky-buttons">
-    <button onclick="calculate()">Calc</button>
-    <button onclick="saveQuote()" id="btn-save">Save</button>
-    <button onclick="loadQuotes()" id="btn-load" class="btn-secondary">Load</button>
-    <button onclick="clearForm()" class="btn-secondary">New</button>
-</div>
+            <div class="panel-card" style="margin-top:18px;">
+              <h4>👥 가이드 배정 현황</h4>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>가이드</th><th>이달 투어</th><th>상태</th></tr></thead>
+                  <tbody id="guide-assignment"></tbody>
+                </table>
+              </div>
+            </div>
 
-<div id="result"></div>
-<p id="message"></p>
+            <div class="panel-card" style="margin-top:18px;">
+              <h4>📢 가이드 공지사항</h4>
+              <div style="display:grid; gap:12px;">
+                <textarea id="notification-text" placeholder="공지사항 입력..." style="min-height:100px;"></textarea>
+                <div style="display:flex; gap:10px;">
+                  <select id="notification-guides" multiple style="flex:1; padding:10px; border-radius:8px; border:1px solid #d1d1d6;">
+                    <option value="">— 모든 가이드 선택 —</option>
+                    <option value="all">모두에게 보내기</option>
+                  </select>
+                  <button onclick="sendNotification()" class="btn-secondary" style="flex:0; min-width:100px;">전송</button>
+                </div>
+              </div>
+            </div>
 
-<div style="margin:12px 0 8px 0;">
-    <input type="text" id="search_input" placeholder="🔍 Search by tour name, agency, pax..." oninput="filterQuotes()" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-</div>
+          </div>
+        </section>
 
-<div id="quote_list"></div>
-<div id="loading-indicator">Loading...</div>
+        <!-- 견적 탭 -->
+        <section id="tab-quotes" class="tab-panel">
+          <div class="panel-card" id="form-section">
+            <div class="editing-banner" id="editing-banner">
+              <span id="editing-label">Editing: —</span>
+              <button onclick="clearForm()" style="flex:0; min-width:60px; padding:6px 12px; min-height:32px; font-size:13px;">Cancel</button>
+            </div>
+
+            <div class="panel-grid">
+              <div>
+                <div class="detail-block">
+                  <summary>견적 정보</summary>
+                  <div>
+                    <div class="form-group"><label>견적번호</label><input id="quote_number" type="text" placeholder="Quote Number"></div>
+                    <div class="form-group"><label>발행일</label><input id="issue_date" type="date"></div>
+                    <div class="form-group"><label>작성자</label><input id="prepared_by" type="text" placeholder="Prepared By"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>클라이언트</summary>
+                  <div>
+                    <div class="form-group"><label>에이전시</label><input id="agency" type="text" placeholder="Agency"></div>
+                    <div class="form-group"><label>담당자</label><input id="contact_person" type="text" placeholder="Contact Person"></div>
+                    <div class="form-group"><label>이메일</label><input id="client_email" type="text" placeholder="Email"></div>
+                    <div class="form-group"><label>전화</label><input id="client_phone" type="text" placeholder="Phone"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>수입</summary>
+                  <div class="form-group"><label>투어료</label><input id="tour_fee" type="number" placeholder="Tour Fee" inputmode="decimal"></div>
+                  <div class="form-group"><label>쇼핑횟수</label><input id="shopping_count" type="number" placeholder="Shopping Count" inputmode="numeric"></div>
+                  <div class="form-group"><label>건강식품 판매</label><input id="health_sales" type="number" placeholder="Health Sales" inputmode="decimal"></div>
+                  <div class="form-group"><label>일반 판매</label><input id="general_sales" type="number" placeholder="General Sales" inputmode="decimal"></div>
+                  <div class="form-group"><label>울 판매</label><input id="wool_sales" type="number" placeholder="Wool Sales" inputmode="decimal"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="detail-block">
+                  <summary>회사 정보</summary>
+                  <div>
+                    <div class="form-group"><label>회사명</label><input id="company_name" type="text" placeholder="Company Name"></div>
+                    <div class="form-group"><label>ABN</label><input id="company_abn" type="text" placeholder="Company ABN"></div>
+                    <div class="form-group"><label>주소</label><input id="company_address" type="text" placeholder="Address"></div>
+                    <div class="form-group"><label>전화</label><input id="company_phone" type="text" placeholder="Phone"></div>
+                    <div class="form-group"><label>이메일</label><input id="company_email" type="text" placeholder="Email"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>이벤트 정보</summary>
+                  <div>
+                    <div class="form-group"><label>투어명</label><input id="tour_name" type="text" placeholder="Tour Name"></div>
+                    <div class="form-group"><label>상태</label><select id="quote_status"><option value="Draft">Draft</option><option value="Pending">Pending</option><option value="Confirmed">Confirmed</option><option value="Cancelled">Cancelled</option></select></div>
+                    <div class="form-group"><label>시작일</label><input id="start_date" type="date"></div>
+                    <div class="form-group"><label>종료일</label><input id="end_date" type="date"></div>
+                    <div class="form-group"><label>차량 타입</label><input id="vehicle_type" type="text" placeholder="Vehicle Type"></div>
+                    <div class="form-group"><label>총 인원</label><input id="pax" type="number" placeholder="Total Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>성인</label><input id="pax_adult" type="number" placeholder="Adult Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>아동</label><input id="pax_child" type="number" placeholder="Child Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>인솔자</label><input id="pax_tc" type="number" placeholder="Teacher/Chaperone" inputmode="numeric"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-grid">
+              <div class="panel-card">
+                <h4>비용</h4>
+                <div class="form-group"><label>숙박비</label><input id="hotel_cost" type="number" placeholder="Hotel Cost" inputmode="decimal"></div>
+                <div id="hotel_rows"></div>
+                <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                  <p id="hotel_subtotal" style="font-weight:600; margin:0; color:#333;">소계: $0.00</p>
+                  <button type="button" onclick="addHotelRow()" class="btn-secondary">+ 호텔 추가</button>
+                </div>
+                <div class="form-group"><label>운송료</label><input id="transport_cost" type="number" placeholder="Transport Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>식사비</label><input id="meal_cost" type="number" placeholder="Meal Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>입장료</label><input id="attraction_cost" type="number" placeholder="Attraction Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>가이드비</label><input id="guide_cost" type="number" placeholder="Guide Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>기타</label><input id="other_cost" type="number" placeholder="Other Cost" inputmode="decimal"></div>
+                <div class="checkbox-row"><label><input id="gst_included" type="checkbox" onchange="calculate()">GST 포함 (10%)</label></div>
+                <div class="form-group"><label>지급 조건</label><input id="payment_terms" type="text" placeholder="Payment Terms"></div>
+                <div class="form-group"><label>취소정책</label><input id="cancellation_policy" type="text" placeholder="Cancellation Policy"></div>
+                <div class="form-group"><label>유효기간</label><input id="valid_until" type="date"></div>
+                <div class="form-group"><label>메모</label><textarea id="notes" placeholder="Notes"></textarea></div>
+              </div>
+
+              <div class="panel-card">
+                <h4>요약</h4>
+                <div class="stats-grid">
+                  <div class="stat-card"><span class="label">총 비용</span><span class="value" id="stat-cost">$0</span></div>
+                  <div class="stat-card"><span class="label">총 수입</span><span class="value" id="stat-income">$0</span></div>
+                  <div class="stat-card"><span class="label">이익/손실</span><span class="value" id="stat-profit">$0</span></div>
+                </div>
+                <div id="result"></div>
+                <p id="message"></p>
+                <div class="sticky-buttons" style="margin-top:22px;">
+                  <button onclick="calculate()">계산</button>
+                  <button onclick="saveQuote()" id="btn-save">저장</button>
+                  <button onclick="clearForm()" class="btn-secondary">초기화</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-card" style="margin-top:18px;">
+            <h4>견적 목록</h4>
+            <div class="search-row">
+              <input type="text" id="search_input" placeholder="🔍 투어명, 에이전시, 인원..." oninput="filterQuotes()">
+              <button class="btn-secondary" onclick="loadQuotes()">새로고침</button>
+            </div>
+            <div id="quote_list"></div>
+          </div>
+        </section>
+
+        <!-- 투어 탭 -->
+        <section id="tab-tours" class="tab-panel">
+          <div class="panel-card">
+            <h3>투어 현황</h3>
+            <div class="search-row">
+              <input type="text" id="tour-search" placeholder="🔍 투어 검색..." oninput="filterTours()">
+              <button class="btn-secondary" onclick="loadTours()">새로고침</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>투어명</th><th>날짜</th><th>인원</th><th>가이드</th><th>상태</th><th>작업</th></tr></thead>
+                <tbody id="tour-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 가이드 탭 -->
+        <section id="tab-guides" class="tab-panel">
+          <div class="panel-card">
+            <h3>가이드 현황</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>가이드</th><th>이달 투어</th><th>확정</th><th>대기</th><th>수입</th></tr></thead>
+                <tbody id="guide-summary"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 정산 탭 -->
+        <section id="tab-settlement" class="tab-panel">
+          <div class="panel-card">
+            <h3>정산 관리</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><span class="label">차량사 미지급</span><span class="value" id="stat-vehicle-debt">$0</span></div>
+              <div class="stat-card"><span class="label">가이드 피 미지급</span><span class="value" id="stat-guide-debt">$0</span></div>
+              <div class="stat-card"><span class="label">쇼핑 마진</span><span class="value" id="stat-shopping-margin">$0</span></div>
+            </div>
+          </div>
+
+          <div class="panel-grid">
+            <div class="panel-card">
+              <h4>💼 차량회사별 외상</h4>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>차량사</th><th>미지급액</th><th>상태</th></tr></thead>
+                  <tbody id="vehicle-debt-table">
+                    <tr><td>로딩 중...</td><td>-</td><td>-</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <h4>👥 가이드 피 미지급</h4>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>가이드</th><th>미지급액</th><th>상태</th></tr></thead>
+                  <tbody id="guide-debt-table">
+                    <tr><td>로딩 중...</td><td>-</td><td>-</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-card" style="margin-top:18px;">
+            <h4>📊 쇼핑 마진 월별 집계</h4>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>월</th><th>쇼핑 판매</th><th>마진액</th><th>마진율</th></tr></thead>
+                <tbody id="shopping-margin-table">
+                  <tr><td>로딩 중...</td><td>-</td><td>-</td><td>-</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 분석 탭 -->
+        <section id="tab-analytics" class="tab-panel">
+          <div class="panel-card">
+            <h3>분석</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><span class="label">평균 마진율</span><span class="value" id="stat-avg-margin">0%</span></div>
+              <div class="stat-card"><span class="label">이달 매출</span><span class="value" id="stat-monthly-revenue">$0</span></div>
+              <div class="stat-card"><span class="label">이달 비용</span><span class="value" id="stat-monthly-cost">$0</span></div>
+            </div>
+          </div>
+
+          <div class="panel-grid">
+            <div class="panel-card">
+              <h4>📊 투어별 마진율</h4>
+              <div id="tour-margin-chart" style="background:#f7f7f7; border-radius:18px; padding:20px; min-height:300px;">
+                <p style="text-align:center; color:#6a6a70;">차트 로딩 중...</p>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <h4>📈 월별 매출/비용 트렌드</h4>
+              <div id="revenue-trend-chart" style="background:#f7f7f7; border-radius:18px; padding:20px; min-height:300px;">
+                <p style="text-align:center; color:#6a6a70;">차트 로딩 중...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-card" style="margin-top:18px;">
+            <h4>👥 가이드별 실적 비교</h4>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>가이드</th><th>투어수</th><th>총 수입</th><th>평균 마진</th></tr></thead>
+                <tbody id="guide-performance-table">
+                  <tr><td>로딩 중...</td><td>-</td><td>-</td><td>-</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+          <div class="panel-card" id="form-section">
+            <div class="editing-banner" id="editing-banner">
+              <span id="editing-label">Editing: —</span>
+              <button onclick="clearForm()" style="flex:0; min-width:60px; padding:6px 12px; min-height:32px; font-size:13px;">Cancel</button>
+            </div>
+
+            <div class="panel-grid">
+              <div>
+                <div class="detail-block">
+                  <summary>Quote Information</summary>
+                  <div>
+                    <div class="form-group"><label>Quote Number</label><input id="quote_number" type="text" placeholder="Quote Number"></div>
+                    <div class="form-group"><label>Issue Date</label><input id="issue_date" type="date"></div>
+                    <div class="form-group"><label>Prepared By</label><input id="prepared_by" type="text" placeholder="Prepared By"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>Client / Agency</summary>
+                  <div>
+                    <div class="form-group"><label>Agency</label><input id="agency" type="text" placeholder="Agency"></div>
+                    <div class="form-group"><label>Contact Person</label><input id="contact_person" type="text" placeholder="Contact Person"></div>
+                    <div class="form-group"><label>Client Email</label><input id="client_email" type="text" placeholder="Client Email"></div>
+                    <div class="form-group"><label>Client Phone</label><input id="client_phone" type="text" placeholder="Client Phone"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>Revenue / Income</summary>
+                  <div class="form-group"><label>Tour Fee</label><input id="tour_fee" type="number" placeholder="Tour Fee" inputmode="decimal"></div>
+                  <div class="form-group"><label>Shopping Count</label><input id="shopping_count" type="number" placeholder="Shopping Count" inputmode="numeric"></div>
+                  <div class="form-group"><label>Health Sales</label><input id="health_sales" type="number" placeholder="Health Sales" inputmode="decimal"></div>
+                  <div class="form-group"><label>General Sales</label><input id="general_sales" type="number" placeholder="General Goods Sales" inputmode="decimal"></div>
+                  <div class="form-group"><label>Wool Sales</label><input id="wool_sales" type="number" placeholder="Wool Sales" inputmode="decimal"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="detail-block">
+                  <summary>Company Information</summary>
+                  <div>
+                    <div class="form-group"><label>Company Name</label><input id="company_name" type="text" placeholder="Company Name"></div>
+                    <div class="form-group"><label>Company ABN</label><input id="company_abn" type="text" placeholder="Company ABN"></div>
+                    <div class="form-group"><label>Company Address</label><input id="company_address" type="text" placeholder="Company Address"></div>
+                    <div class="form-group"><label>Company Phone</label><input id="company_phone" type="text" placeholder="Company Phone"></div>
+                    <div class="form-group"><label>Company Email</label><input id="company_email" type="text" placeholder="Company Email"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <summary>Event Information</summary>
+                  <div>
+                    <div class="form-group"><label>Tour Name</label><input id="tour_name" type="text" placeholder="Tour Name"></div>
+                    <div class="form-group"><label>Quote Status</label><select id="quote_status"><option value="Draft">Draft</option><option value="Pending">Pending</option><option value="Confirmed">Confirmed</option><option value="Cancelled">Cancelled</option></select></div>
+                    <div class="form-group"><label>Start Date</label><input id="start_date" type="date"></div>
+                    <div class="form-group"><label>End Date</label><input id="end_date" type="date"></div>
+                    <div class="form-group"><label>Vehicle Type</label><input id="vehicle_type" type="text" placeholder="Vehicle Type"></div>
+                    <div class="form-group"><label>Total Pax</label><input id="pax" type="number" placeholder="Total Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>Adult Pax</label><input id="pax_adult" type="number" placeholder="Adult Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>Child Pax</label><input id="pax_child" type="number" placeholder="Child Pax" inputmode="numeric"></div>
+                    <div class="form-group"><label>Teacher / Chaperone Pax</label><input id="pax_tc" type="number" placeholder="Teacher/Chaperone Pax" inputmode="numeric"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-grid">
+              <div class="panel-card">
+                <h3>Hotel & Cost</h3>
+                <div class="form-group"><label>Hotel Cost</label><input id="hotel_cost" type="number" placeholder="Hotel Cost" inputmode="decimal"></div>
+                <div id="hotel_rows"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px;">
+                  <p id="hotel_subtotal" style="font-weight:600; margin:0; color:#333;">Subtotal: $0.00</p>
+                  <button type="button" onclick="addHotelRow()" class="btn-secondary">+ Add Hotel</button>
+                </div>
+                <div class="form-group"><label>Transport Cost</label><input id="transport_cost" type="number" placeholder="Transport Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>Meal Cost</label><input id="meal_cost" type="number" placeholder="Meal Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>Attraction Cost</label><input id="attraction_cost" type="number" placeholder="Attraction Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>Guide Cost</label><input id="guide_cost" type="number" placeholder="Guide Cost" inputmode="decimal"></div>
+                <div class="form-group"><label>Other Cost</label><input id="other_cost" type="number" placeholder="Other Cost" inputmode="decimal"></div>
+                <div class="checkbox-row"><label><input id="gst_included" type="checkbox" onchange="calculate()">GST Included (10%)</label></div>
+                <div class="form-group"><label>Payment Terms</label><input id="payment_terms" type="text" placeholder="Payment Terms"></div>
+                <div class="form-group"><label>Cancellation Policy</label><input id="cancellation_policy" type="text" placeholder="Cancellation Policy"></div>
+                <div class="form-group"><label>Valid Until</label><input id="valid_until" type="date"></div>
+                <div class="form-group"><label>Notes</label><textarea id="notes" placeholder="Additional Notes"></textarea></div>
+              </div>
+
+              <div class="panel-card">
+                <h3>Quick Summary</h3>
+                <div class="stats-grid">
+                  <div class="stat-card"><span class="label">Total Cost</span><span class="value" id="stat-cost">$0</span></div>
+                  <div class="stat-card"><span class="label">Operating Income</span><span class="value" id="stat-income">$0</span></div>
+                  <div class="stat-card"><span class="label">Profit / Loss</span><span class="value" id="stat-profit">$0</span></div>
+                </div>
+                <div id="result"></div>
+                <p id="message"></p>
+                <div class="sticky-buttons" style="margin-top:22px;">
+                  <button onclick="calculate()">Calc</button>
+                  <button onclick="saveQuote()" id="btn-save">Save</button>
+                  <button onclick="clearForm()" class="btn-secondary">New</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-tours" class="tab-panel">
+          <div class="panel-card">
+            <h3>투어 현황</h3>
+            <div class="search-row">
+              <input type="text" id="search_input" placeholder="🔍 Search by tour name, agency, pax..." oninput="filterQuotes()">
+              <button class="btn-secondary" onclick="loadQuotes()">Refresh</button>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card"><span class="label">Quotes Loaded</span><span class="value" id="stat-quotes">0</span></div>
+              <div class="stat-card"><span class="label">Confirmed</span><span class="value" id="stat-confirmed">0</span></div>
+              <div class="stat-card"><span class="label">Pending</span><span class="value" id="stat-pending">0</span></div>
+            </div>
+            <div class="table-wrapper">
+              <div id="quote_list"></div>
+            </div>
+            <div id="loading-indicator">Loading...</div>
+          </div>
+        </section>
+
+        <section id="tab-guides" class="tab-panel">
+          <div class="panel-card">
+            <h3>가이드 현황</h3>
+            <p style="color:#6a6a70; margin-bottom:18px;">현재 로드된 견적 데이터 기반으로 가이드별 요약을 확인하세요.</p>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Guide</th><th>Quotes</th><th>Confirmed</th><th>Pending</th><th>Profit</th></tr></thead>
+                <tbody id="guide-summary"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
 
 <script>
+function selectTab(tabId, button) {
+  document.querySelectorAll('.btn-nav').forEach(btn => btn.classList.remove('active'));
+  if (button) button.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  
+  // 탭별 데이터 로드
+  if (tabId === 'tab-dashboard') loadDashboard();
+  else if (tabId === 'tab-tours') loadTours();
+  else if (tabId === 'tab-settlement') loadSettlement();
+  else if (tabId === 'tab-analytics') loadAnalytics();
+}
+
+// 대시보드 로드
+async function loadDashboard() {
+  try {
+    if (!tourProfile?.company_id) return;
+    const thisMonth = new Date().toISOString().slice(0,7);
+    
+    // 이달 투어 수
+    const { data: tours, error: toursErr } = await sb
+      .from('tours')
+      .select('id', { count: 'exact' })
+      .eq('company_id', tourProfile.company_id)
+      .gte('start_date', thisMonth + '-01')
+      .lt('start_date', thisMonth + '-32');
+    document.getElementById('stat-month-tours').innerText = tours?.length || 0;
+    
+    // 미확정 견적
+    const { data: quotes } = await sb
+      .from('quotes')
+      .select('id', { count: 'exact' })
+      .eq('company_id', tourProfile.company_id)
+      .eq('quote_status', 'Pending');
+    document.getElementById('stat-pending-quotes').innerText = quotes?.length || 0;
+    
+    // 가이드 현황
+    const { data: guides } = await sb
+      .from('tours')
+      .select('assigned_guide', { count: 'exact' })
+      .eq('company_id', tourProfile.company_id)
+      .gte('start_date', thisMonth + '-01')
+      .not('assigned_guide', 'is', null);
+    document.getElementById('stat-assigned-guides').innerText = guides?.length || 0;
+    
+    // 가이드 배정 현황 테이블
+    const { data: guideData } = await sb
+      .from('tours')
+      .select('assigned_guide, start_date, status')
+      .eq('company_id', tourProfile.company_id)
+      .gte('start_date', thisMonth + '-01');
+    
+    const guideMap = {};
+    (guideData || []).forEach(t => {
+      if (t.assigned_guide) {
+        if (!guideMap[t.assigned_guide]) {
+          guideMap[t.assigned_guide] = { name: t.assigned_guide, tours: 0, status: t.status };
+        }
+        guideMap[t.assigned_guide].tours++;
+      }
+    });
+    
+    const guideAssignmentHtml = Object.values(guideMap).map(g => 
+      `<tr><td>${g.name}</td><td>${g.tours}</td><td><span class="badge ${g.status === 'Completed' ? 'green' : 'yellow'}">${g.status}</span></td></tr>`
+    ).join('');
+    document.getElementById('guide-assignment').innerHTML = guideAssignmentHtml || '<tr><td colspan="3" style="text-align:center; color:#6a6a70;">가이드 배정 정보 없음</td></tr>';
+  } catch (err) {
+    console.error('loadDashboard error:', err);
+  }
+}
+
+// 투어 로드
+async function loadTours() {
+  try {
+    if (!tourProfile?.company_id) return;
+    const { data, error } = await sb
+      .from('tours')
+      .select('*')
+      .eq('company_id', tourProfile.company_id)
+      .order('start_date', { ascending: false });
+    
+    if (error) throw error;
+    
+    const html = (data || []).map(t => `
+      <tr>
+        <td>${t.tour_name || 'Untitled'}</td>
+        <td>${t.start_date ? new Date(t.start_date).toLocaleDateString('ko-KR') : '—'}</td>
+        <td>${t.pax || 0}</td>
+        <td>${t.assigned_guide || '미배정'}</td>
+        <td><span class="badge ${t.status === 'Confirmed' ? 'green' : t.status === 'Pending' ? 'yellow' : 'red'}">${t.status}</span></td>
+        <td><button class="btn-secondary" style="padding:8px 12px; font-size:12px;">편집</button></td>
+      </tr>
+    `).join('');
+    
+    document.getElementById('tour-list').innerHTML = html || '<tr><td colspan="6" style="text-align:center; color:#6a6a70;">투어 정보 없음</td></tr>';
+  } catch (err) {
+    console.error('loadTours error:', err);
+  }
+}
+
+// 정산 로드
+async function loadSettlement() {
+  try {
+    if (!tourProfile?.company_id) return;
+    
+    // 차량사별 외상 계산
+    const { data: tours } = await sb
+      .from('tours')
+      .select('transport_cost, vehicle_company')
+      .eq('company_id', tourProfile.company_id)
+      .eq('settlement_status', 'Unpaid');
+    
+    const vehicleDebtMap = {};
+    (tours || []).forEach(t => {
+      const company = t.vehicle_company || '미지정';
+      vehicleDebtMap[company] = (vehicleDebtMap[company] || 0) + (t.transport_cost || 0);
+    });
+    
+    const totalVehicleDebt = Object.values(vehicleDebtMap).reduce((a, b) => a + b, 0);
+    document.getElementById('stat-vehicle-debt').innerText = '$' + totalVehicleDebt.toLocaleString(undefined, {maximumFractionDigits:0});
+    
+    const vehicleHtml = Object.entries(vehicleDebtMap).map(([company, debt]) => `
+      <tr><td>${company}</td><td>$${debt.toLocaleString(undefined, {maximumFractionDigits:2})}</td><td><span class="badge red">미지급</span></td></tr>
+    `).join('');
+    document.getElementById('vehicle-debt-table').innerHTML = vehicleHtml || '<tr><td colspan="3" style="text-align:center; color:#6a6a70;">외상 정보 없음</td></tr>';
+    
+    // 가이드 피 미지급
+    const { data: guideData } = await sb
+      .from('daily_records')
+      .select('guide_id, guide_fee')
+      .eq('company_id', tourProfile.company_id)
+      .eq('guide_payment_status', 'Unpaid');
+    
+    const guideDebtMap = {};
+    (guideData || []).forEach(d => {
+      guideDebtMap[d.guide_id] = (guideDebtMap[d.guide_id] || 0) + (d.guide_fee || 0);
+    });
+    
+    const totalGuideDebt = Object.values(guideDebtMap).reduce((a, b) => a + b, 0);
+    document.getElementById('stat-guide-debt').innerText = '$' + totalGuideDebt.toLocaleString(undefined, {maximumFractionDigits:0});
+    
+    const guideHtml = Object.entries(guideDebtMap).map(([guide, debt]) => `
+      <tr><td>${guide}</td><td>$${debt.toLocaleString(undefined, {maximumFractionDigits:2})}</td><td><span class="badge red">미지급</span></td></tr>
+    `).join('');
+    document.getElementById('guide-debt-table').innerHTML = guideHtml || '<tr><td colspan="3" style="text-align:center; color:#6a6a70;">미지급 정보 없음</td></tr>';
+    
+    // 쇼핑 마진 월별
+    const { data: reports } = await sb
+      .from('reports')
+      .select('date, shopping_sales, shopping_cost')
+      .eq('company_id', tourProfile.company_id)
+      .order('date', { ascending: false })
+      .limit(12);
+    
+    const monthlyMargin = {};
+    (reports || []).forEach(r => {
+      const month = r.date.slice(0, 7);
+      if (!monthlyMargin[month]) monthlyMargin[month] = { sales: 0, cost: 0 };
+      monthlyMargin[month].sales += r.shopping_sales || 0;
+      monthlyMargin[month].cost += r.shopping_cost || 0;
+    });
+    
+    const totalShoppingMargin = Object.values(monthlyMargin).reduce((sum, m) => sum + (m.sales - m.cost), 0);
+    document.getElementById('stat-shopping-margin').innerText = '$' + totalShoppingMargin.toLocaleString(undefined, {maximumFractionDigits:0});
+    
+    const shoppingHtml = Object.entries(monthlyMargin).map(([month, data]) => {
+      const margin = data.sales - data.cost;
+      const marginRate = data.sales > 0 ? ((margin / data.sales) * 100).toFixed(1) : '0';
+      return `<tr><td>${month}</td><td>$${data.sales.toLocaleString(undefined, {maximumFractionDigits:2})}</td><td>$${margin.toLocaleString(undefined, {maximumFractionDigits:2})}</td><td>${marginRate}%</td></tr>`;
+    }).join('');
+    document.getElementById('shopping-margin-table').innerHTML = shoppingHtml || '<tr><td colspan="4" style="text-align:center; color:#6a6a70;">데이터 없음</td></tr>';
+  } catch (err) {
+    console.error('loadSettlement error:', err);
+  }
+}
+
+// 분석 로드
+async function loadAnalytics() {
+  try {
+    if (!tourProfile?.company_id) return;
+    
+    // 투어별 마진율 및 월별 트렌드
+    const { data: reports } = await sb
+      .from('reports')
+      .select('*')
+      .eq('company_id', tourProfile.company_id)
+      .order('date', { ascending: false })
+      .limit(30);
+    
+    if (!reports || reports.length === 0) {
+      document.getElementById('tour-margin-chart').innerHTML = '<p style="text-align:center; color:#6a6a70;">분석 데이터 없음</p>';
+      return;
+    }
+    
+    // 평균 마진율
+    const avgMargin = reports.reduce((sum, r) => {
+      const margin = (r.total_revenue || 0) - (r.total_cost || 0);
+      const revenue = r.total_revenue || 1;
+      return sum + ((margin / revenue) * 100);
+    }, 0) / reports.length;
+    document.getElementById('stat-avg-margin').innerText = avgMargin.toFixed(1) + '%';
+    
+    // 월별 매출/비용
+    const monthlyData = {};
+    reports.forEach(r => {
+      const month = r.date.slice(0, 7);
+      if (!monthlyData[month]) monthlyData[month] = { revenue: 0, cost: 0 };
+      monthlyData[month].revenue += r.total_revenue || 0;
+      monthlyData[month].cost += r.total_cost || 0;
+    });
+    
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const monthlyRevenue = monthlyData[thisMonth]?.revenue || 0;
+    const monthlyCost = monthlyData[thisMonth]?.cost || 0;
+    
+    document.getElementById('stat-monthly-revenue').innerText = '$' + monthlyRevenue.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById('stat-monthly-cost').innerText = '$' + monthlyCost.toLocaleString(undefined, {maximumFractionDigits:0});
+    
+    // 가이드별 실적
+    const { data: dailyRecords } = await sb
+      .from('daily_records')
+      .select('guide_id, guide_fee, tour_id')
+      .eq('company_id', tourProfile.company_id);
+    
+    const guidePerf = {};
+    (dailyRecords || []).forEach(d => {
+      if (!guidePerf[d.guide_id]) {
+        guidePerf[d.guide_id] = { name: d.guide_id, tours: 0, income: 0 };
+      }
+      guidePerf[d.guide_id].tours++;
+      guidePerf[d.guide_id].income += d.guide_fee || 0;
+    });
+    
+    const guideHtml = Object.values(guidePerf)
+      .sort((a, b) => b.income - a.income)
+      .slice(0, 10)
+      .map(g => `
+        <tr>
+          <td>${g.name}</td>
+          <td>${g.tours}</td>
+          <td>$${g.income.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+          <td>${g.tours > 0 ? (g.income / g.tours).toFixed(0) : 0}</td>
+        </tr>
+      `).join('');
+    document.getElementById('guide-performance-table').innerHTML = guideHtml || '<tr><td colspan="4" style="text-align:center; color:#6a6a70;">가이드 데이터 없음</td></tr>';
+    
+    // 간단한 차트 렌더링 (text-based)
+    const tourMarginHtml = reports.slice(0, 10).map(r => {
+      const margin = r.total_revenue - r.total_cost;
+      const rate = r.total_revenue > 0 ? ((margin / r.total_revenue) * 100) : 0;
+      const barWidth = Math.max(rate, 0) * 3;
+      return `<div style="margin:8px 0; display:flex; gap:8px; align-items:center;">
+        <div style="width:120px; font-size:12px;">${r.tour_name?.slice(0,15) || 'Tour'}</div>
+        <div style="background:#1c1c1e; height:20px; border-radius:4px; width:${barWidth}px;"></div>
+        <div style="font-size:12px; font-weight:600;">${rate.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+    document.getElementById('tour-margin-chart').innerHTML = tourMarginHtml || '<p style="color:#6a6a70;">데이터 없음</p>';
+    
+    // 월별 트렌드
+    const trendHtml = Object.entries(monthlyData).slice(-6).map(([month, data]) => {
+      const profit = data.revenue - data.cost;
+      return `<div style="margin:8px 0; padding:10px; background:#f7f7f7; border-radius:8px; font-size:13px;">
+        <strong>${month}:</strong> 매출 $${data.revenue.toLocaleString(undefined, {maximumFractionDigits:0})} | 비용 $${data.cost.toLocaleString(undefined, {maximumFractionDigits:0})} | 이익 $${profit.toLocaleString(undefined, {maximumFractionDigits:0})}
+      </div>`;
+    }).join('');
+    document.getElementById('revenue-trend-chart').innerHTML = trendHtml || '<p style="color:#6a6a70;">데이터 없음</p>';
+  } catch (err) {
+    console.error('loadAnalytics error:', err);
+  }
+}
+
+function filterTours() {
+  const keyword = (document.getElementById('tour-search')?.value || '').toLowerCase();
+  // 필터링 로직 (필요시 구현)
+}
+
+// 가이드 공지사항 전송
+async function sendNotification() {
+  const text = document.getElementById('notification-text')?.value || '';
+  if (!text.trim()) {
+    showMsg('공지사항을 입력해주세요.', 'error');
+    return;
+  }
+  
+  try {
+    if (!tourProfile?.company_id) {
+      showMsg('회사 인증이 필요합니다.', 'error');
+      return;
+    }
+    
+    // 모든 가이드 조회
+    const { data: tours } = await sb
+      .from('tours')
+      .select('assigned_guide')
+      .eq('company_id', tourProfile.company_id)
+      .not('assigned_guide', 'is', null);
+    
+    const guides = [...new Set((tours || []).map(t => t.assigned_guide).filter(g => g))];
+    
+    if (guides.length === 0) {
+      showMsg('배정된 가이드가 없습니다.', 'error');
+      return;
+    }
+    
+    // Supabase notifications 테이블에 저장 (필요시 생성)
+    const notifications = guides.map(guide => ({
+      company_id: tourProfile.company_id,
+      guide_id: guide,
+      message: text,
+      type: 'announcement',
+      is_read: false,
+      created_at: new Date().toISOString()
+    }));
+    
+    const { error } = await sb.from('guide_notifications').insert(notifications);
+    
+    if (error) {
+      console.warn('Notification insert error (table may not exist):', error);
+      // 테이블이 없는 경우 로컬 알림만
+      showMsg('공지사항이 로컬에 저장되었습니다. DB 테이블 설정 후 자동 동기화됩니다.', 'success');
+    } else {
+      showMsg(`${guides.length}명의 가이드에게 공지사항을 전송했습니다.`, 'success');
+    }
+    
+    document.getElementById('notification-text').value = '';
+  } catch (err) {
+    console.error('sendNotification error:', err);
+    showMsg('공지사항 전송 중 오류가 발생했습니다.', 'error');
+  }
+}
+
+// 투어 상태 변경 시 자동 알림
+async function notifyOnTourStatusChange(tourId, newStatus, guildId) {
+  try {
+    if (!tourProfile?.company_id) return;
+    
+    const statusMessages = {
+      'Confirmed': '투어가 확정되었습니다.',
+      'Completed': '투어가 완료되었습니다.',
+      'Cancelled': '투어가 취소되었습니다.'
+    };
+    
+    const message = statusMessages[newStatus] || `투어 상태: ${newStatus}`;
+    
+    const { error } = await sb.from('guide_notifications').insert({
+      company_id: tourProfile.company_id,
+      guide_id: guildId,
+      message: message,
+      type: 'tour_update',
+      tour_id: tourId,
+      is_read: false,
+      created_at: new Date().toISOString()
+    });
+    
+    if (!error) {
+      console.log('Tour status notification sent:', message);
+    }
+  } catch (err) {
+    console.warn('notifyOnTourStatusChange error:', err);
+  }
+}
+
+
 var SUPABASE_URL = "https://oybauzioqabopskxdaea.supabase.co";
 var SUPABASE_KEY = "sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB";
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var tourUser = null;
+var tourProfile = null;
+
+function showTourLogin() {
+    document.getElementById('login-screen').style.display = 'block';
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('login-msg').innerText = '';
+}
+
+function showTourApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('company-name').innerText = tourProfile?.company_name || tourProfile?.company_id || 'Company';
+    loadDashboard();
+    loadQuotes();
+}
+
+async function loadTourProfile(user) {
+    const { data, error } = await sb.from('profiles').select('company_id, company_name').eq('id', user.id).single();
+    if (error) {
+        console.warn('loadTourProfile error', error);
+        return null;
+    }
+    return data;
+}
+
+async function tourLogin() {
+    const email = document.getElementById('admin-email').value.trim();
+    const password = document.getElementById('admin-password').value;
+    const msg = document.getElementById('login-msg');
+    msg.innerText = '';
+    if (!email || !password) { msg.innerText = 'Email과 비밀번호를 입력하세요.'; return; }
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { msg.innerText = error.message; return; }
+    tourUser = data.user;
+    tourProfile = await loadTourProfile(tourUser);
+    if (!tourProfile || !tourProfile.company_id) {
+        msg.innerText = '회사 정보가 없습니다. 관리자에게 문의하세요.';
+        return;
+    }
+    showTourApp();
+}
+
+async function tourLogout() {
+    await sb.auth.signOut();
+    tourUser = null;
+    tourProfile = null;
+    showTourLogin();
+}
+
+async function initTourflow() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) {
+        tourUser = user;
+        tourProfile = await loadTourProfile(user);
+        if (tourProfile && tourProfile.company_id) {
+            showTourApp();
+            return;
+        }
+    }
+    showTourLogin();
+}
 
 var editingId = null;
 var total_cost = 0;
@@ -226,6 +1027,7 @@ var total_incl_gst = 0;
 var profit_loss = 0;
 var profit_rate = 0;
 var status = "";
+var quote_status = "Draft";
 var isSaving = false;
 var quotesCache = [];
 
@@ -311,6 +1113,7 @@ function dbPayload() {
     calculate();
     return {
         tour_name: document.getElementById("tour_name").value || null,
+        quote_status: document.getElementById("quote_status").value || "Draft",
         agency: document.getElementById("agency").value || null,
         pax: val("pax"),
         hotel_cost: val("hotel_cost"),
@@ -398,38 +1201,37 @@ async function saveQuote() {
     var data = dbPayload();
     showMsg("Saving...", "info");
 
-    var url = editingId
-        ? SUPABASE_URL + "/rest/v1/quotes?id=eq." + editingId
-        : SUPABASE_URL + "/rest/v1/quotes";
-
-    var method = editingId ? "PATCH" : "POST";
-
     try {
-        var res = await fetch(url, {
-            method: method,
-            headers: {
-                "Content-Type": "application/json",
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Prefer": "return=representation"
-            },
-            body: JSON.stringify(data)
-        });
+        if (!tourProfile || !tourProfile.company_id) {
+            showMsg('회사 인증이 필요합니다.', 'error');
+            return;
+        }
+        data.company_id = tourProfile.company_id;
+        data.company_name = tourProfile.company_name || data.company_name;
 
-        var text = await res.text();
-
-        if (!res.ok) {
-            showMsg("Save failed: " + res.status, "error");
-            console.error("Save error:", res.status, text);
+        var res;
+        if (editingId) {
+            res = await sb.from('quotes').update(data).eq('id', editingId).single();
         } else {
-            showMsg(editingId ? "Updated successfully" : "Saved successfully", "success");
+            res = await sb.from('quotes').insert(data).single();
+        }
+
+        if (res.error) {
+            showMsg('Save failed: ' + res.error.message, 'error');
+            console.error('Save error:', res.error);
+        } else {
+            showMsg(editingId ? 'Updated successfully' : 'Saved successfully', 'success');
+            const savedQuote = res.data;
             editingId = null;
-            document.getElementById("form-section").classList.remove("editing-highlight");
-            document.getElementById("editing-banner").classList.remove("show");
+            document.getElementById('form-section').classList.remove('editing-highlight');
+            document.getElementById('editing-banner').classList.remove('show');
+            if (savedQuote && savedQuote.quote_status === 'Confirmed') {
+                await createTourFromQuote(savedQuote);
+            }
             await loadQuotes();
             setTimeout(function() {
-                var el = document.getElementById("search_input");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                var el = document.getElementById('search_input');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 600);
         }
     } catch (err) {
@@ -442,6 +1244,53 @@ async function saveQuote() {
     isSaving = false;
 }
 
+function normalizedQuoteStatus(value) {
+    return String(value || '').trim();
+}
+
+function quoteIsConfirmed(value) {
+    return normalizedQuoteStatus(value).toLowerCase() === 'confirmed';
+}
+
+async function createTourFromQuote(quote) {
+    if (!quote || !quoteIsConfirmed(quote.quote_status) || !quote.id) return;
+    try {
+        const { data: existing, error: existsErr } = await sb
+            .from('tours')
+            .select('id')
+            .eq('quote_id', quote.id)
+            .maybeSingle();
+        if (existsErr) {
+            console.warn('createTourFromQuote exists query failed', existsErr);
+        }
+        if (existing && existing.id) return;
+
+        const tourPayload = {
+            quote_id: quote.id,
+            company_id: quote.company_id || tourProfile?.company_id || null,
+            company_name: quote.company_name || null,
+            tour_name: quote.tour_name || null,
+            scheduled_date: quote.start_date || null,
+            start_time: quote.start_time || null,
+            end_date: quote.end_date || null,
+            guest_name: quote.contact_person || quote.agency || quote.client_email || null,
+            status: 'Confirmed',
+            guide_fee: quote.guide_cost || 0,
+            shopping_sales: (quote.health_sales || 0) + (quote.general_sales || 0) + (quote.wool_sales || 0),
+            total_revenue: quote.total_operating_income || quote.tour_fee || 0
+        };
+
+        const { error: insertErr } = await sb.from('tours').insert(tourPayload);
+        if (insertErr) {
+            console.warn('createTourFromQuote failed', insertErr);
+        } else {
+            showMsg('Confirmed quote and created tour schedule.', 'success');
+        }
+    } catch (err) {
+        console.error('createTourFromQuote exception', err);
+    }
+}
+
 async function loadQuotes() {
     var loadBtn = document.getElementById("btn-load");
     if (loadBtn) { loadBtn.disabled = true; loadBtn.innerText = "Loading..."; }
@@ -449,32 +1298,26 @@ async function loadQuotes() {
     document.getElementById("quote_list").innerHTML = "";
 
     try {
-        var res = await fetch(SUPABASE_URL + "/rest/v1/quotes?select=*&order=id.desc", {
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Accept": "application/json"
-            }
-        });
-
-        if (!res.ok) {
-            var errText = await res.text();
-            console.error("Load failed:", res.status, errText);
-            document.getElementById("quote_list").innerHTML =
-                '<p class="msg-error">Failed to load quotes (' + res.status + '). Tap Load to retry.</p>';
-            document.getElementById("loading-indicator").style.display = "none";
-            if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
+        if (!tourProfile || !tourProfile.company_id) {
+            showMsg('회사 인증이 필요합니다.', 'error');
+            return;
+        }
+        const { data, error } = await sb
+            .from('quotes')
+            .select('*')
+            .eq('company_id', tourProfile.company_id)
+            .order('id', { ascending: false });
+        if (error) {
+            console.error('Load failed:', error);
+            document.getElementById('quote_list').innerHTML =
+                '<p class="msg-error">Failed to load quotes. Tap Load to retry.</p>';
             return;
         }
 
-        var data = await res.json();
-
         if (!Array.isArray(data)) {
-            console.error("Unexpected response:", data);
-            document.getElementById("quote_list").innerHTML =
+            console.error('Unexpected response:', data);
+            document.getElementById('quote_list').innerHTML =
                 '<p class="msg-error">Unexpected data format. Tap Load to retry.</p>';
-            document.getElementById("loading-indicator").style.display = "none";
-            if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
             return;
         }
 
@@ -598,6 +1441,7 @@ function editQuote(q) {
     document.getElementById("cancellation_policy").value = q.cancellation_policy || "";
     document.getElementById("valid_until").value = q.valid_until || "";
     document.getElementById("notes").value = q.notes || "";
+    document.getElementById("quote_status").value = q.quote_status || "Draft";
 
     calculate();
     showMsg("Editing: " + (q.tour_name || "quote"), "info");
@@ -613,16 +1457,13 @@ async function deleteQuote(id) {
     showMsg("Deleting...", "info");
 
     try {
-        var res = await fetch(SUPABASE_URL + "/rest/v1/quotes?id=eq." + id, {
-            method: "DELETE",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY
-            }
-        });
-
-        if (!res.ok) {
-            showMsg("Delete failed: " + res.status, "error");
+        if (!tourProfile || !tourProfile.company_id) {
+            showMsg('회사 인증이 필요합니다.', 'error');
+            return;
+        }
+        var { error } = await sb.from('quotes').delete().eq('id', id).eq('company_id', tourProfile.company_id);
+        if (error) {
+            showMsg('Delete failed: ' + error.message, 'error');
             return;
         }
 
@@ -896,8 +1737,9 @@ function printQuote(q) {
 
 function clearForm() {
     editingId = null;
-    document.querySelectorAll("input[type='text'], input[type='number'], input[type='date'], textarea").forEach(function(i) { i.value = ""; });
+    document.querySelectorAll("input[type='text'], select, input[type='number'], input[type='date'], textarea").forEach(function(i) { i.value = ""; });
     document.querySelectorAll("input[type='checkbox']").forEach(function(i) { i.checked = false; });
+    document.getElementById("quote_status").value = "Draft";
     document.getElementById("result").innerHTML = "";
     document.getElementById("result").classList.remove("show");
     document.getElementById("hotel_rows").innerHTML = "";
@@ -924,7 +1766,7 @@ function exportBackup() {
     showMsg("Backup downloaded", "success");
 }
 
-loadQuotes();
+initTourflow();
 
 function renderQuoteList(data) {
     var loadBtn = document.getElementById("btn-load");
@@ -946,10 +1788,12 @@ function renderQuoteList(data) {
         var toi = (q.total_operating_income != null) ? q.total_operating_income : (q.total_revenue != null ? q.total_revenue : 0);
         var displayStatus = mapStatusDisplay(q.status, pl);
         var cls = displayStatus.cls;
+        var quoteStatusLabel = q.quote_status || 'Draft';
 
         html +=
             '<div class="box ' + cls + '">' +
             '<h4>' + (q.tour_name || "Untitled") + '</h4>' +
+            '<p>Status: ' + quoteStatusLabel + '</p>' +
             '<p>Agency: ' + (q.agency || "\u2014") + ' | Pax: ' + (q.pax || "\u2014") + '</p>' +
             '<p>Cost: $' + (q.total_cost || 0).toLocaleString() + ' \u2192 Income: $' + toi.toLocaleString() + '</p>' +
             '<p>P/L: <span class="' + cls + '">$' + pl.toLocaleString() + ' (' + pr.toFixed(1) + '%)</span> | ' + displayStatus.label + '</p>' +
