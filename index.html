@@ -252,8 +252,21 @@
 </head>
 <body>
 <div class="screen">
-
   <div class="app-shell">
+    <!-- Landing screen (shown before login) -->
+    <div id="landing-screen" class="card" style="margin-top:12px;">
+      <div class="card-header">
+        <h2>Welcome to TourFlow</h2>
+        <p style="color:#6a6a70;margin-top:6px;font-size:14px;">Select an app to continue</p>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <button onclick="goToGuide()" style="padding:14px;border-radius:14px;background:#1c1c1e;color:#fff;font-weight:700;font-size:16px;">가이드 앱 (Guide)</button>
+          <button onclick="goToQuote()" style="padding:14px;border-radius:14px;background:#f2f2f7;color:#1c1c1e;font-weight:700;font-size:16px;border:1px solid #d1d1d6;">견적 앱 (Quote)</button>
+          <button onclick="goToAdmin()" style="padding:14px;border-radius:14px;background:#f2f2f7;color:#1c1c1e;font-weight:700;font-size:16px;border:1px solid #d1d1d6;">관리자 대시보드 (Admin)</button>
+        </div>
+      </div>
+    </div>
     <div class="card today-card">
       <div class="card-header">
         <h2>Today</h2>
@@ -296,7 +309,7 @@
   </div>
 
 <!-- ① 로그인 화면 -->
-<div id="auth-screen">
+<div id="auth-screen" style="display:none;">
   <div class="card">
     <h2>📋 가이드 리포트 로그인</h2>
     <div class="field">
@@ -741,8 +754,32 @@ const Today = {
 };
 
 // =====================================================
-// 🚀 초기화
+// Landing handlers + initialization
 // =====================================================
+function goToGuide() {
+  document.getElementById('landing-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'block';
+  document.getElementById('report-screen').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'none';
+}
+
+function goToQuote() {
+  window.location.href = 'tourflow.html';
+}
+
+function goToAdmin() {
+  window.location.href = 'admin.html';
+}
+
+function showLanding() {
+  document.getElementById('landing-screen').style.display = 'block';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('report-screen').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'none';
+}
+
+// initialize
+showLanding();
 Today.init();
 Auth.init();
 </script>
