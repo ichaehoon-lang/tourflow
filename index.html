@@ -243,7 +243,8 @@
     .grid-item { width:56px; height:56px; border-radius:10px; background:#fff; border:1px solid #d1d1d6; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
 
     .today-list { display:flex; flex-direction:column; gap:8px; }
-    .list-item { display:flex; align-items:center; padding:12px; background: #fff; border-radius:12px; border:1px solid #e6e6ea; }
+    .list-item { display:flex; align-items:center; padding:12px; background: #fff; border-radius:12px; border:1px solid #e6e6ea; cursor:pointer; transition: background .2s, border-color .2s; }
+    .list-item.selected { background:#f2f2f7; border-color:#1c1c1e; }
     .item-left { flex: 1; font-weight:700; color:#1c1c1e; }
     .item-middle { width:140px; color:#6a6a70; font-size:14px; }
     .item-right { width:120px; display:flex; gap:8px; justify-content:flex-end; }
@@ -263,7 +264,6 @@
         <div style="display:flex;flex-direction:column;gap:12px;">
           <button onclick="goToGuide()" style="padding:14px;border-radius:14px;background:#1c1c1e;color:#fff;font-weight:700;font-size:16px;">가이드 앱 (Guide)</button>
           <button onclick="goToQuote()" style="padding:14px;border-radius:14px;background:#f2f2f7;color:#1c1c1e;font-weight:700;font-size:16px;border:1px solid #d1d1d6;">견적 앱 (Quote)</button>
-          <button onclick="goToAdmin()" style="padding:14px;border-radius:14px;background:#f2f2f7;color:#1c1c1e;font-weight:700;font-size:16px;border:1px solid #d1d1d6;">관리자 대시보드 (Admin)</button>
         </div>
       </div>
     </div>
@@ -332,11 +332,9 @@
     <button class="btn-logout" onclick="Auth.logout()">로그아웃</button>
   </div>
 
-  <div id="offline-banner">⚠️ 오프라인 — 입력값이 임시 저장됩니다. 연결 복구 후 제출하세요.</div>
-
-  <div class="card">
-    <h2>📋 투어 리포트</h2>
-
+    <div id="selected-tour-box" style="padding:0 18px 12px; color:#1c1c1e; font-size:14px;">
+      선택된 투어: <span id="selected-tour-label">없음</span>
+    </div>
     <!-- 출발 시간 -->
     <div class="field">
       <label>예정 출발 시간</label>
@@ -405,6 +403,7 @@ const STORAGE_BUCKET = 'receipts';
 const OFFLINE_KEY    = 'tf_report_draft';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let selectedTour = null;
 
 // =====================================================
 // 🔐 Auth
@@ -438,7 +437,10 @@ const Auth = {
 
   async init() {
     const { data: { user } } = await sb.auth.getUser();
-    if (user) Auth.showReport(user);
+    if (user) {
+      Auth.showReport(user);
+      Today.load();
+    }
   }
 };
 
@@ -561,6 +563,22 @@ const Report = {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) throw new Error('로그인이 필요합니다.');
 
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      const { data: profileData, error: profileErr } = await sb
+        .from('profiles')
+        .select('company_id')
+        .eq('id', user.id)
+        .single();
+      const companyId = profileData?.company_id || null;
+
+      const tour = selectedTour || null;
+      const tourId = tour?.id || null;
+      const guideFee = tour?.guide_fee ?? tour?.guide_cost ?? 0;
+      const shoppingSales = tour?.shopping_sales ?? ((tour?.health_sales || 0) + (tour?.general_sales || 0) + (tour?.wool_sales || 0));
+      const totalRevenue = tour?.total_revenue ?? tour?.tour_fee ?? 0;
+
       // ── 1. 이미지 순차 업로드 ──────────────────────
       const receiptUrls = [];
       for (let i = 0; i < files.length; i++) {
@@ -588,16 +606,66 @@ const Report = {
       progressFill.style.width  = '90%';
       progressLabel.innerText   = '데이터 저장 중...';
 
-      const { error: dbErr } = await sb
-        .from('reports')
+      const { data: dailyData, error: dailyErr } = await sb
+        .from('daily_records')
         .insert({
-          guide_id:        user.id,
-          actual_end_time: endTime,
-          receipt_urls:    receiptUrls,
-          notes:           notes || null
-        });
+          guide_id:      user.id,
+          company_id:    companyId,
+          tour_id:       tourId,
+          record_date:   todayStr,
+          start_time:    tour?.start_time || null,
+          end_time:      endTime,
+          guide_fee:     guideFee,
+          shopping_sales: shoppingSales,
+          total_revenue: totalRevenue,
+          notes:         notes || null
+        })
+        .select()
+        .single();
 
-      if (dbErr) throw new Error('DB 저장 실패: ' + dbErr.message);
+      if (dailyErr) throw new Error('Daily 기록 저장 실패: ' + dailyErr.message);
+
+      const reportPayload = {
+        guide_id:        user.id,
+        company_id:      companyId,
+        tour_id:         tourId,
+        daily_record_id: dailyData?.id || null,
+        report_date:     todayStr,
+        actual_end_time: endTime,
+        receipt_urls:    receiptUrls,
+        notes:           notes || null,
+        amount:          guideFee + shoppingSales
+      };
+
+      const { data: reportData, error: dbErr } = await sb
+        .from('reports')
+        .insert(reportPayload)
+        .select()
+        .single();
+
+      if (dbErr) {
+        if (/column .* does not exist/i.test(dbErr.message)) {
+          const { error: fallbackErr } = await sb
+            .from('reports')
+            .insert({
+              guide_id:        user.id,
+              company_id:      companyId,
+              actual_end_time: endTime,
+              receipt_urls:    receiptUrls,
+              notes:           notes || null
+            });
+          if (fallbackErr) throw fallbackErr;
+        } else {
+          throw new Error('DB 저장 실패: ' + dbErr.message);
+        }
+      }
+
+      await sendReportEmail(reportData?.id || null, {
+        tour_id: tourId,
+        company_id: companyId,
+        guide_id: user.id,
+        end_time: endTime
+      });
 
       // ── 3. 완료 ─────────────────────────────────────
       progressFill.style.width  = '100%';
@@ -641,6 +709,21 @@ const Report = {
   }
 };
 
+async function sendReportEmail(reportId, payload) {
+  try {
+    if (!reportId) return;
+    await sb.functions.invoke('send_report_email', {
+      body: {
+        report_id: reportId,
+        ...payload
+      }
+    });
+    console.log('Requested report email notification for', reportId);
+  } catch (err) {
+    console.warn('Report email notification failed', err);
+  }
+}
+
 // =====================================================
 // 🌐 오프라인 감지
 // =====================================================
@@ -673,12 +756,35 @@ const Today = {
       const d = String(today.getDate()).padStart(2, '0');
       const todayStr = `${y}-${m}-${d}`; // expecting a YYYY-MM-DD field value
 
-      // 1) fetch today's tours (adjust table/field names if your schema differs)
-      let { data, error } = await sb
-        .from('tours')
-        .select('id, guest_name, start_time, tour_type, status')
-        .eq('scheduled_date', todayStr)
-        .order('start_time', { ascending: true });
+      const { data: authData, error: authErr } = await sb.auth.getUser();
+      if (authErr || !authData.user) {
+        listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">로그인 후 확인하세요.</div>';
+        return;
+      }
+      const user = authData.user;
+
+      const { data: profileData } = await sb
+        .from('profiles')
+        .select('company_id')
+        .eq('id', user.id)
+        .single();
+      const companyId = profileData?.company_id || null;
+
+      // 1) fetch today's tours for this guide or company
+      let q = sb.from('tours').select('*').eq('scheduled_date', todayStr);
+      if (companyId) {
+        q = q.eq('company_id', companyId);
+      } else if (user.id) {
+        q = q.eq('assigned_guide', user.id);
+      }
+      q = q.order('start_time', { ascending: true });
+
+      let { data, error } = await q;
+      Today.tours = data || [];
+      if (data && data.length === 1) {
+        selectedTour = data[0];
+        document.getElementById('selected-tour-label').innerText = selectedTour.tour_name || selectedTour.guest_name || '오늘 일정';
+      }
 
       if (error) {
         console.warn('Today: primary query failed', error);
@@ -692,7 +798,9 @@ const Today = {
       } else {
         data.forEach(item => {
           const li = document.createElement('div');
-          li.className = 'list-item';
+          li.className = 'list-item' + (selectedTour && selectedTour.id === item.id ? ' selected' : '');
+          li.dataset.tourId = item.id;
+          li.onclick = () => Today.selectTour(item, li);
 
           const left = document.createElement('div'); left.className = 'item-left';
           left.innerText = item.guest_name || item.leader || '이름 없음';
@@ -750,6 +858,13 @@ const Today = {
       const listEl = document.querySelector('.today-list');
       if (listEl) listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">데이터 로드 실패</div>';
     }
+  },
+
+  selectTour(item, listItem) {
+    selectedTour = item;
+    document.querySelectorAll('.today-list .list-item').forEach(el => el.classList.remove('selected'));
+    if (listItem) listItem.classList.add('selected');
+    document.getElementById('selected-tour-label').innerText = item.tour_name || item.guest_name || '오늘 일정';
   }
 };
 
@@ -765,10 +880,6 @@ function goToGuide() {
 
 function goToQuote() {
   window.location.href = 'tourflow.html';
-}
-
-function goToAdmin() {
-  window.location.href = 'admin.html';
 }
 
 function showLanding() {

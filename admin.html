@@ -89,18 +89,18 @@ async function loadReports(){
   const empty = document.getElementById('reports-empty');
   tbody.innerHTML=''; empty.style.display='none';
   try{
-    let q = sb.from('reports').select('id,guide_id,actual_end_time,receipt_urls,notes,amount,cost');
-    if(from) q = q.gte('actual_end_time', from);
-    if(to) q = q.lte('actual_end_time', to);
+    let q = sb.from('reports').select('id,guide_id,report_date,actual_end_time,receipt_urls,notes,amount,cost');
+    if(from) q = q.gte('report_date', from);
+    if(to) q = q.lte('report_date', to);
     if(guide) q = q.eq('guide_id', guide);
-    const { data, error } = await q.order('actual_end_time',{ascending:false});
+    const { data, error } = await q.order('report_date',{ascending:false});
     if(error) throw error;
     if(!data || data.length===0){ empty.style.display='block'; updateStats([]); return; }
     let weekTotal=0, monthTotal=0, marginTotal=0;
     const now = new Date(); const monthStart = new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
     const weekStart = (function(){const d=new Date(); const day=d.getDay(); const diff=d.getDate() - day + (day===0?-6:1); d.setDate(diff); return d.toISOString().slice(0,10)})();
     data.forEach(r=>{
-      const date = (r.actual_end_time||'').slice(0,10) || '';
+      const date = (r.report_date||'').slice(0,10) || (r.actual_end_time||'').slice(0,10) || '';
       const amount = parseNum(r.amount);
       const cost = parseNum(r.cost);
       const margin = amount - cost;
