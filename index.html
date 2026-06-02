@@ -1,1076 +1,486 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Tour Quote App</title>
-<style>
-* { box-sizing: border-box; }
-body {
-    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    padding: 16px;
-    padding-bottom: 90px;
-    margin: 0;
-    background: #f5f5f5;
-    -webkit-tap-highlight-color: transparent;
-}
-h2 { margin-top: 0; font-size: 1.4em; }
-.sticky-buttons {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    padding: 8px 12px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.12);
-    display: flex;
-    justify-content: space-around;
-    z-index: 1000;
-    gap: 6px;
-}
-.sticky-buttons button {
-    flex: 1;
-}
-input[type="text"], input[type="number"], input[type="date"], textarea {
-    margin: 6px 0;
-    padding: 14px 12px;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    background: #fff;
-    -webkit-appearance: none;
-    font-family: inherit;
-}
-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-input:focus, textarea:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
-}
-input[type="checkbox"] {
-    margin: 6px 8px 6px 0;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff;
-    vertical-align: middle;
-}
-input[type="checkbox"]:checked {
-    background: #007bff;
-    border-color: #007bff;
-}
-button {
-    padding: 12px 16px;
-    cursor: pointer;
-    min-height: 44px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    touch-action: manipulation;
-    transition: opacity 0.15s, transform 0.1s;
-}
-button:active {
-    opacity: 0.8;
-    transform: scale(0.97);
-}
-button:disabled {
-    background-color: #ccc;
-    color: #888;
-    cursor: not-allowed;
-    opacity: 0.6;
-    transform: none;
-}
-button.btn-secondary {
-    background-color: #17a2b8;
-}
-button.btn-secondary:active {
-    background-color: #138496;
-}
-button.btn-secondary:disabled {
-    background-color: #ccc;
-    color: #888;
-}
-button.btn-danger {
-    background-color: #dc3545;
-}
-button.btn-danger:active {
-    background-color: #c82333;
-}
-.form-section {
-    background: #fff;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    margin-bottom: 16px;
-}
-details {
-    background: #fff;
-    padding: 0;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    margin-bottom: 12px;
-    overflow: hidden;
-}
-#quote_list {
-    margin-top: 16px;
-    padding-bottom: 20px;
-}
-details summary {
-    padding: 16px;
-    cursor: pointer;
-    font-weight: 600;
-    color: #333;
-    background: #f9f9f9;
-    border-bottom: 1px solid #eee;
-    user-select: none;
-    -webkit-user-select: none;
-}
-details summary:hover {
-    background: #f0f0f0;
-}
-details[open] summary {
-    border-bottom: 1px solid #ddd;
-}
-details > div {
-    padding: 16px;
-}
-.checkbox-row {
-    display: flex;
-    align-items: center;
-    margin: 12px 0;
-}
-.checkbox-row label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 16px;
-}
-.checkbox-row input[type="checkbox"] {
-    margin: 0 8px 0 0;
-}
-.box {
-    border: 1px solid #e0e0e0;
-    border-left: 5px solid;
-    padding: 14px;
-    margin: 12px 0;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    background-color: #fff;
-}
-.box.good { border-left-color: #28a745; }
-.box.risk { border-left-color: #ffc107; }
-.box.bad { border-left-color: #dc3545; }
-.box h4 { margin: 0 0 8px 0; color: #333; font-size: 1.1em; }
-.box p { margin: 4px 0; font-size: 0.9em; color: #555; }
-.box .quote-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-.box .quote-actions button {
-    flex: 1;
-    min-width: 70px;
-    padding: 10px 12px;
-    min-height: 40px;
-    font-size: 13px;
-}
-.good { color: #28a745; font-weight: bold; }
-.risk { color: #e67e00; font-weight: bold; }
-.bad { color: #dc3545; font-weight: bold; }
-.editing-highlight {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 12px rgba(0, 123, 255, 0.3);
-}
-.editing-banner {
-    background: #007bff;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-}
-.editing-banner.show { display: flex; }
-#loading-indicator {
-    text-align: center;
-    padding: 20px;
-    font-size: 1em;
-    color: #666;
-    display: none;
-}
-#message {
-    padding: 8px 0;
-    font-size: 0.9em;
-    min-height: 20px;
-}
-.msg-success { color: #28a745; }
-.msg-error { color: #dc3545; }
-.msg-info { color: #007bff; }
-#result {
-    background: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 12px 0;
-    font-size: 0.95em;
-    line-height: 1.6;
-    display: none;
-}
-#result.show { display: block; }
-@media (min-width: 768px) {
-    body { padding: 30px; padding-bottom: 90px; max-width: 900px; margin: 0 auto; }
-    input[type="text"], input[type="number"], input[type="date"], textarea {
-        width: 48%;
-        display: inline-block;
-        margin-right: 2%;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>가이드 리포트</title>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f4f8; min-height: 100vh; padding: 16px;
     }
-    .sticky-buttons {
-        max-width: 900px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 12px 12px 0 0;
-        padding: 12px 20px;
+    .card {
+      background: #fff; border-radius: 14px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.09); max-width: 480px;
+      margin: 0 auto; margin-bottom: 14px;
     }
-}
-</style>
+    h2 { font-size: 1.1em; margin-bottom: 14px; color: #1e293b; }
+    h3 { font-size: .85em; text-transform: uppercase; letter-spacing: .8px;
+         color: #64748b; margin-bottom: 12px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 600;
+                   color: #475569; margin-bottom: 4px; }
+    .field input[type=text],
+    .field input[type=email],
+    .field textarea {
+      width: 100%; padding: 11px 12px; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 15px; font-family: inherit;
+      background: #fff;
+    }
+    .field input[readonly] { background: #f8fafc; color: #334155; }
+    .field textarea { resize: vertical; min-height: 72px; }
+    input:focus, textarea:focus {
+      outline: none; border-color: #1e40af;
+      box-shadow: 0 0 0 2px rgba(30,64,175,.13);
+    }
+
+    /* 사진 업로드 */
+    .photo-btns { display: flex; gap: 8px; margin-bottom: 10px; }
+    .photo-btns button { flex: 1; padding: 10px 6px; font-size: 13px;
+                         font-weight: 700; border: none; border-radius: 8px;
+                         cursor: pointer; touch-action: manipulation; }
+    .btn-cam  { background: #0f766e; color: #fff; }
+    .btn-gal  { background: #6d28d9; color: #fff; }
+    .btn-cam:active, .btn-gal:active { opacity: .8; }
+    input[type=file] { display: none; }
+
+    .preview-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .preview-item {
+      position: relative; width: 80px; height: 80px;
+      border-radius: 7px; overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .preview-item .rm {
+      position: absolute; top: 2px; right: 2px;
+      background: rgba(0,0,0,.6); color: #fff;
+      border: none; border-radius: 50%; width: 20px; height: 20px;
+      font-size: 11px; cursor: pointer; line-height: 20px; text-align: center;
+      padding: 0;
+    }
+    .photo-count { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+    /* 진행률 */
+    .progress-wrap { margin: 10px 0; display: none; }
+    .progress-bar-bg {
+      background: #e2e8f0; border-radius: 999px; height: 8px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: #1e40af; height: 100%; width: 0%;
+      transition: width .3s; border-radius: 999px;
+    }
+    .progress-label { font-size: 12px; color: #475569; margin-top: 4px; }
+
+    /* 오프라인 배너 */
+    #offline-banner {
+      display: none; background: #fef3c7; border: 1px solid #fde68a;
+      color: #92400e; font-size: 12px; font-weight: 600;
+      padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;
+    }
+
+    /* 액션 버튼 */
+    .btn-end {
+      width: 100%; padding: 13px; background: #ff6b35; color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+      cursor: pointer; touch-action: manipulation; margin-bottom: 10px;
+    }
+    .btn-submit {
+      width: 100%; padding: 13px; background: #1e40af; color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+      cursor: pointer; touch-action: manipulation;
+    }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-end:not(:disabled):active,
+    .btn-submit:not(:disabled):active { opacity: .85; }
+
+    /* 인증 화면 */
+    #auth-screen { max-width: 480px; margin: 40px auto; }
+    #auth-screen h2 { text-align: center; margin-bottom: 20px; font-size: 1.2em; }
+    .btn-login {
+      width: 100%; padding: 13px; background: #1e40af; color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 10px;
+    }
+    .auth-msg { font-size: 13px; color: #dc2626; margin-top: 8px; text-align: center; }
+
+    /* 완료 화면 */
+    #success-screen {
+      display: none; text-align: center; padding: 40px 20px;
+      max-width: 480px; margin: 0 auto;
+    }
+    #success-screen .icon { font-size: 56px; }
+    #success-screen p { font-size: 16px; font-weight: 700; color: #16a34a;
+                        margin: 12px 0 6px; }
+    #success-screen small { font-size: 13px; color: #64748b; }
+    .btn-new {
+      margin-top: 20px; padding: 11px 24px; background: #1e40af; color: #fff;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* 로그아웃 */
+    .topbar { display: flex; justify-content: space-between; align-items: center;
+              max-width: 480px; margin: 0 auto 10px; }
+    .topbar span { font-size: 13px; color: #64748b; }
+    .btn-logout { padding: 5px 12px; background: #f1f5f9; color: #475569;
+                  border: none; border-radius: 6px; font-size: 12px;
+                  font-weight: 600; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-<h2>Tour Quote Management</h2>
-
-<div class="editing-banner" id="editing-banner">
-    <span id="editing-label">Editing: —</span>
-    <button onclick="clearForm()" style="flex:0; min-width:60px; padding:6px 12px; min-height:32px; font-size:13px;">Cancel</button>
+<!-- ① 로그인 화면 -->
+<div id="auth-screen">
+  <div class="card">
+    <h2>📋 가이드 리포트 로그인</h2>
+    <div class="field">
+      <label>이메일</label>
+      <input type="email" id="auth-email" placeholder="guide@example.com">
+    </div>
+    <div class="field">
+      <label>비밀번호</label>
+      <input type="password" id="auth-pw" placeholder="••••••••">
+    </div>
+    <button class="btn-login" onclick="Auth.login()">로그인</button>
+    <p class="auth-msg" id="auth-msg"></p>
+  </div>
 </div>
 
-<div class="form-section" id="form-section">
-    <!-- Quote Information -->
-    <details>
-        <summary>Quote Information</summary>
-        <div>
-            <input id="quote_number" type="text" placeholder="Quote Number">
-            <input id="issue_date" type="date">
-            <input id="prepared_by" type="text" placeholder="Prepared By">
-        </div>
-    </details>
+<!-- ② 리포트 입력 화면 -->
+<div id="report-screen" style="display:none;">
+  <div class="topbar">
+    <span id="user-label">가이드: —</span>
+    <button class="btn-logout" onclick="Auth.logout()">로그아웃</button>
+  </div>
 
-    <!-- Company Information -->
-    <details>
-        <summary>Company Information</summary>
-        <div>
-            <input id="company_name" type="text" placeholder="Company Name">
-            <input id="company_abn" type="text" placeholder="Company ABN">
-            <input id="company_address" type="text" placeholder="Company Address">
-            <input id="company_phone" type="text" placeholder="Company Phone">
-            <input id="company_email" type="text" placeholder="Company Email">
-        </div>
-    </details>
+  <div id="offline-banner">⚠️ 오프라인 — 입력값이 임시 저장됩니다. 연결 복구 후 제출하세요.</div>
 
-    <!-- Client / Agency Information -->
-    <details>
-        <summary>Client / Agency Information</summary>
-        <div>
-            <input id="agency" type="text" placeholder="Agency">
-            <input id="contact_person" type="text" placeholder="Contact Person">
-            <input id="client_email" type="text" placeholder="Client Email">
-            <input id="client_phone" type="text" placeholder="Client Phone">
-        </div>
-    </details>
+  <div class="card">
+    <h2>📋 투어 리포트</h2>
 
-    <!-- Event Information -->
-    <details open>
-        <summary>Event Information</summary>
-        <div>
-            <input id="tour_name" type="text" placeholder="Tour Name">
-            <input id="start_date" type="date">
-            <input id="end_date" type="date">
-            <input id="pickup_location" type="text" placeholder="Pickup Location">
-            <input id="dropoff_location" type="text" placeholder="Dropoff Location">
-            <input id="vehicle_type" type="text" placeholder="Vehicle Type">
-            <input id="pax" type="number" placeholder="Total Pax" inputmode="numeric">
-            <input id="pax_adult" type="number" placeholder="Adult Pax" inputmode="numeric">
-            <input id="pax_child" type="number" placeholder="Child Pax" inputmode="numeric">
-            <input id="pax_tc" type="number" placeholder="Teacher/Chaperone Pax" inputmode="numeric">
-            <input id="pax_foc" type="number" placeholder="Free of Charge Pax" inputmode="numeric">
-        </div>
-    </details>
+    <!-- 출발 시간 -->
+    <div class="field">
+      <label>예정 출발 시간</label>
+      <input type="text" id="start-time" value="08:00" readonly>
+    </div>
 
-    <!-- Cost Breakdown -->
-    <details open>
-        <summary>Cost Breakdown</summary>
-        <div>
-            <input id="hotel_cost" type="number" placeholder="Hotel Cost" inputmode="decimal">
-            <input id="transport_cost" type="number" placeholder="Transport Cost" inputmode="decimal">
-            <input id="meal_cost" type="number" placeholder="Meal Cost" inputmode="decimal">
-            <input id="attraction_cost" type="number" placeholder="Attraction Cost" inputmode="decimal">
-            <input id="guide_cost" type="number" placeholder="Guide Cost" inputmode="decimal">
-            <input id="other_cost" type="number" placeholder="Other Cost" inputmode="decimal">
-        </div>
-    </details>
+    <!-- 종료 시간 -->
+    <div class="field">
+      <label>실제 종료 시간</label>
+      <input type="text" id="end-time" placeholder="종료 버튼을 누르세요" readonly>
+    </div>
 
-    <!-- Revenue -->
-    <details open>
-        <summary>Revenue</summary>
-        <div>
-            <input id="selling_price" type="number" placeholder="Selling Price" inputmode="decimal">
-            <input id="shopping_revenue" type="number" placeholder="Shopping Revenue" inputmode="decimal">
-        </div>
-    </details>
+    <!-- 비고 -->
+    <div class="field">
+      <label>비고 (선택)</label>
+      <textarea id="notes" placeholder="특이사항을 입력하세요"></textarea>
+    </div>
 
-    <!-- Commercial Terms -->
-    <details>
-        <summary>Commercial Terms</summary>
-        <div>
-            <div class="checkbox-row">
-                <label>
-                    <input id="gst_included" type="checkbox" onchange="calculate()">
-                    GST Included (10%)
-                </label>
-            </div>
-            <input id="payment_terms" type="text" placeholder="Payment Terms">
-            <input id="cancellation_policy" type="text" placeholder="Cancellation Policy">
-            <input id="valid_until" type="date">
-            <textarea id="notes" placeholder="Additional Notes"></textarea>
-        </div>
-    </details>
+    <!-- 영수증 사진 -->
+    <div class="field">
+      <label>영수증 사진 첨부 (최대 5장)</label>
+      <input type="file" id="cam-input"  accept="image/*" capture="environment" onchange="Photos.add(this)">
+      <input type="file" id="gal-input"  accept="image/*" multiple            onchange="Photos.add(this)">
+      <div class="photo-btns">
+        <button class="btn-cam" type="button" onclick="document.getElementById('cam-input').click()">📷 카메라</button>
+        <button class="btn-gal" type="button" onclick="document.getElementById('gal-input').click()">🖼️ 갤러리</button>
+      </div>
+      <div class="preview-grid" id="preview-grid"></div>
+      <p class="photo-count" id="photo-count"></p>
+    </div>
+
+    <!-- 진행률 -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <p class="progress-label" id="progress-label">업로드 중...</p>
+    </div>
+
+    <!-- 버튼 -->
+    <button class="btn-end" id="end-btn" onclick="Report.captureEndTime()">
+      🔴 투어 종료 (Turn off)
+    </button>
+    <button class="btn-submit" id="submit-btn" onclick="Report.submit()">
+      최종 제출
+    </button>
+  </div>
 </div>
 
-<div class="sticky-buttons">
-    <button onclick="calculate()">Calc</button>
-    <button onclick="saveQuote()" id="btn-save">Save</button>
-    <button onclick="loadQuotes()" id="btn-load" class="btn-secondary">Load</button>
-    <button onclick="clearForm()" class="btn-secondary">New</button>
+<!-- ③ 제출 완료 화면 -->
+<div id="success-screen">
+  <div class="icon">✅</div>
+  <p>리포트 제출 완료!</p>
+  <small id="success-detail"></small>
+  <br>
+  <button class="btn-new" onclick="Report.reset()">새 리포트 작성</button>
 </div>
-
-<div id="result"></div>
-<p id="message"></p>
-
-<div id="quote_list"></div>
-<div id="loading-indicator">Loading...</div>
 
 <script>
-var SUPABASE_URL = "https://oybauzioqabopskxdaea.supabase.co";
-var SUPABASE_KEY = "sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB";
+// =====================================================
+// ⚙️ 설정 — 본인 Supabase 값으로 교체하세요
+// =====================================================
+const SUPABASE_URL  = 'https://oybauzioqabopskxdaea.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB';
+const STORAGE_BUCKET = 'receipts';
+const OFFLINE_KEY    = 'tf_report_draft';
 
-var editingId = null;
-var total_cost = 0;
-var total_revenue = 0;
-var gst_amount = 0;
-var total_incl_gst = 0;
-var margin = 0;
-var margin_rate = 0;
-var status = "";
-var isSaving = false;
-var quotesCache = [];
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function val(id) {
-    var v = document.getElementById(id).value;
-    return v === "" ? null : Number(v);
-}
+// =====================================================
+// 🔐 Auth
+// =====================================================
+const Auth = {
+  async login() {
+    const email = document.getElementById('auth-email').value.trim();
+    const pw    = document.getElementById('auth-pw').value;
+    const msg   = document.getElementById('auth-msg');
+    if (!email || !pw) { msg.innerText = '이메일과 비밀번호를 입력하세요.'; return; }
 
-function num(id) {
-    var v = val(id);
-    return v === null ? 0 : v;
-}
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if (error) { msg.innerText = error.message; return; }
 
-function showMsg(text, type) {
-    var el = document.getElementById("message");
-    el.innerText = text;
-    el.className = type === "error" ? "msg-error" : type === "success" ? "msg-success" : "msg-info";
-}
+    Auth.showReport(data.user);
+  },
 
-function getTodayDate() {
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, '0');
-    var day = String(today.getDate()).padStart(2, '0');
-    return year + '-' + month + '-' + day;
-}
+  async logout() {
+    await sb.auth.signOut();
+    document.getElementById('report-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display   = 'block';
+  },
 
-function getDatePlus30Days() {
-    var today = new Date();
-    today.setDate(today.getDate() + 30);
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, '0');
-    var day = String(today.getDate()).padStart(2, '0');
-    return year + '-' + month + '-' + day;
-}
+  showReport(user) {
+    document.getElementById('auth-screen').style.display   = 'none';
+    document.getElementById('report-screen').style.display = 'block';
+    document.getElementById('user-label').innerText =
+      '가이드: ' + (user.email || user.id.slice(0, 8));
+    Draft.load();
+  },
 
-function getStatusEnglish(m) {
-    if (m > 1500) return "Prepared";
-    else if (m >= 0) return "Internal Review";
-    else return "Draft";
-}
+  async init() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) Auth.showReport(user);
+  }
+};
 
-function calculate() {
-    total_cost =
-        num("hotel_cost") +
-        num("transport_cost") +
-        num("meal_cost") +
-        num("attraction_cost") +
-        num("guide_cost") +
-        num("other_cost");
+// =====================================================
+// 📸 Photos
+// =====================================================
+const Photos = {
+  _files: [],
+  MAX: 5,
 
-    total_revenue =
-        num("selling_price") +
-        num("shopping_revenue");
+  add(input) {
+    const newFiles = Array.from(input.files);
+    const remaining = this.MAX - this._files.length;
+    if (remaining <= 0) { alert('최대 5장까지 첨부 가능합니다.'); return; }
+    newFiles.slice(0, remaining).forEach(f => this._files.push(f));
+    input.value = '';
+    this.render();
+    Draft.save();
+  },
 
-    var gst_checked = document.getElementById("gst_included").checked;
-    gst_amount = gst_checked ? Math.round(total_revenue * 0.1 * 100) / 100 : 0;
-    total_incl_gst = total_revenue + gst_amount;
+  remove(idx) {
+    this._files.splice(idx, 1);
+    this.render();
+    Draft.save();
+  },
 
-    margin = total_revenue - total_cost;
-    margin_rate = total_revenue > 0 ? (margin / total_revenue) * 100 : 0;
-
-    status = getStatusEnglish(margin);
-
-    var cls = status === "Prepared" ? "good" : status === "Internal Review" ? "risk" : "bad";
-
-    var resultEl = document.getElementById("result");
-    var gstLine = gst_checked ? '<br>GST (10%): <b>$' + gst_amount.toLocaleString() + '</b><br>Total (incl. GST): <b>$' + total_incl_gst.toLocaleString() + '</b>' : '';
-    resultEl.innerHTML =
-        "Total Cost: <b>$" + total_cost.toLocaleString() + "</b><br>" +
-        "Total Revenue: <b>$" + total_revenue.toLocaleString() + "</b>" + gstLine + "<br>" +
-        "Margin: <b class='" + cls + "'>$" + margin.toLocaleString() + "</b><br>" +
-        "Margin Rate: " + margin_rate.toFixed(2) + "%<br>" +
-        "Status: <span class='" + cls + "'>" + status + "</span>";
-    resultEl.classList.add("show");
-}
-
-// DB payload: only existing columns that the quotes table already has
-function dbPayload() {
-    calculate();
-    return {
-        tour_name: document.getElementById("tour_name").value || null,
-        agency: document.getElementById("agency").value || null,
-        pax: val("pax"),
-        hotel_cost: val("hotel_cost"),
-        transport_cost: val("transport_cost"),
-        meal_cost: val("meal_cost"),
-        attraction_cost: val("attraction_cost"),
-        guide_cost: val("guide_cost"),
-        other_cost: val("other_cost"),
-        selling_price: val("selling_price"),
-        shopping_revenue: val("shopping_revenue"),
-        total_cost: total_cost,
-        total_revenue: total_revenue,
-        margin: margin,
-        margin_rate: margin_rate,
-        status: status
-    };
-}
-
-// Full form data for PDF/local use (not sent to DB)
-function fullFormData() {
-    calculate();
-    return {
-        quote_number: document.getElementById("quote_number").value || null,
-        issue_date: document.getElementById("issue_date").value || null,
-        prepared_by: document.getElementById("prepared_by").value || null,
-        company_name: document.getElementById("company_name").value || null,
-        company_abn: document.getElementById("company_abn").value || null,
-        company_address: document.getElementById("company_address").value || null,
-        company_phone: document.getElementById("company_phone").value || null,
-        company_email: document.getElementById("company_email").value || null,
-        agency: document.getElementById("agency").value || null,
-        contact_person: document.getElementById("contact_person").value || null,
-        client_email: document.getElementById("client_email").value || null,
-        client_phone: document.getElementById("client_phone").value || null,
-        tour_name: document.getElementById("tour_name").value || null,
-        start_date: document.getElementById("start_date").value || null,
-        end_date: document.getElementById("end_date").value || null,
-        pickup_location: document.getElementById("pickup_location").value || null,
-        dropoff_location: document.getElementById("dropoff_location").value || null,
-        vehicle_type: document.getElementById("vehicle_type").value || null,
-        pax: val("pax"),
-        pax_adult: val("pax_adult"),
-        pax_child: val("pax_child"),
-        pax_tc: val("pax_tc"),
-        pax_foc: val("pax_foc"),
-        hotel_cost: val("hotel_cost"),
-        transport_cost: val("transport_cost"),
-        meal_cost: val("meal_cost"),
-        attraction_cost: val("attraction_cost"),
-        guide_cost: val("guide_cost"),
-        other_cost: val("other_cost"),
-        selling_price: val("selling_price"),
-        shopping_revenue: val("shopping_revenue"),
-        gst_included: document.getElementById("gst_included").checked,
-        gst_amount: gst_amount,
-        total_incl_gst: total_incl_gst,
-        payment_terms: document.getElementById("payment_terms").value || null,
-        cancellation_policy: document.getElementById("cancellation_policy").value || null,
-        valid_until: document.getElementById("valid_until").value || null,
-        notes: document.getElementById("notes").value || null,
-        total_cost: total_cost,
-        total_revenue: total_revenue,
-        margin: margin,
-        margin_rate: margin_rate,
-        status: status
-    };
-}
-
-async function saveQuote() {
-    if (isSaving) return;
-    isSaving = true;
-    var btn = document.getElementById("btn-save");
-    btn.disabled = true;
-    btn.innerText = "Saving...";
-
-    var data = dbPayload();
-    showMsg("Saving...", "info");
-
-    var url = editingId
-        ? SUPABASE_URL + "/rest/v1/quotes?id=eq." + editingId
-        : SUPABASE_URL + "/rest/v1/quotes";
-
-    var method = editingId ? "PATCH" : "POST";
-
-    try {
-        var res = await fetch(url, {
-            method: method,
-            headers: {
-                "Content-Type": "application/json",
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Prefer": "return=representation"
-            },
-            body: JSON.stringify(data)
-        });
-
-        var text = await res.text();
-
-        if (!res.ok) {
-            showMsg("Save failed: " + res.status, "error");
-            console.error("Save error:", res.status, text);
-        } else {
-            showMsg(editingId ? "Updated successfully" : "Saved successfully", "success");
-            editingId = null;
-            document.getElementById("form-section").classList.remove("editing-highlight");
-            document.getElementById("editing-banner").classList.remove("show");
-            loadQuotes();
-        }
-    } catch (err) {
-        showMsg("Network error: " + err.message, "error");
-        console.error("Save exception:", err);
-    }
-
-    btn.disabled = false;
-    btn.innerText = "Save";
-    isSaving = false;
-}
-
-async function loadQuotes() {
-    var loadBtn = document.getElementById("btn-load");
-    if (loadBtn) { loadBtn.disabled = true; loadBtn.innerText = "Loading..."; }
-    document.getElementById("loading-indicator").style.display = "block";
-    document.getElementById("quote_list").innerHTML = "";
-
-    try {
-        var res = await fetch(SUPABASE_URL + "/rest/v1/quotes?select=*&order=id.desc", {
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Accept": "application/json"
-            }
-        });
-
-        if (!res.ok) {
-            var errText = await res.text();
-            console.error("Load failed:", res.status, errText);
-            document.getElementById("quote_list").innerHTML =
-                '<p class="msg-error">Failed to load quotes (' + res.status + '). Tap Load to retry.</p>';
-            document.getElementById("loading-indicator").style.display = "none";
-            if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
-            return;
-        }
-
-        var data = await res.json();
-
-        if (!Array.isArray(data)) {
-            console.error("Unexpected response:", data);
-            document.getElementById("quote_list").innerHTML =
-                '<p class="msg-error">Unexpected data format. Tap Load to retry.</p>';
-            document.getElementById("loading-indicator").style.display = "none";
-            if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
-            return;
-        }
-
-        quotesCache = data;
-
-        if (data.length === 0) {
-            document.getElementById("quote_list").innerHTML =
-                '<p style="text-align:center; color:#888;">No quotes saved yet.</p>';
-            document.getElementById("loading-indicator").style.display = "none";
-            if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
-            return;
-        }
-
-        var html = '<p style="color:#666; font-size:0.85em;">' + data.length + ' quotes loaded</p>';
-
-        data.forEach(function(q, idx) {
-            var displayStatus = mapStatusDisplay(q.status);
-            var cls = displayStatus.cls;
-
-            html +=
-                '<div class="box ' + cls + '">' +
-                '<h4>' + (q.tour_name || "Untitled") + '</h4>' +
-                '<p>Agency: ' + (q.agency || "\u2014") + ' | Pax: ' + (q.pax || "\u2014") + '</p>' +
-                '<p>Cost: $' + (q.total_cost || 0).toLocaleString() + ' \u2192 Revenue: $' + (q.total_revenue || 0).toLocaleString() + '</p>' +
-                '<p>Margin: <span class="' + cls + '">$' + (q.margin || 0).toLocaleString() + ' (' + (q.margin_rate ? q.margin_rate.toFixed(1) : "0.0") + '%)</span> | ' + displayStatus.label + '</p>' +
-                '<div class="quote-actions">' +
-                '<button onclick="editQuoteByIndex(' + idx + ')">Edit</button>' +
-                '<button onclick="deleteQuote(\'' + q.id + '\')" class="btn-danger">Delete</button>' +
-                '<button onclick="printQuoteByIndex(' + idx + ')" class="btn-secondary">PDF</button>' +
-                '</div></div>';
-        });
-
-        document.getElementById("quote_list").innerHTML = html;
-    } catch (err) {
-        console.error("loadQuotes error:", err);
-        document.getElementById("quote_list").innerHTML =
-            '<p class="msg-error">Network error. Check connection and tap Load.</p>';
-    }
-
-    document.getElementById("loading-indicator").style.display = "none";
-    if (loadBtn) { loadBtn.disabled = false; loadBtn.innerText = "Load"; }
-}
-
-function mapStatusDisplay(s) {
-    // Map both Korean legacy and English statuses
-    if (s === "Prepared" || s === "\uc9c4\ud589 \uac00\ub2a5") return { cls: "good", label: "Prepared" };
-    if (s === "Internal Review" || s === "\uc704\ud5d8") return { cls: "risk", label: "Internal Review" };
-    return { cls: "bad", label: "Draft" };
-}
-
-function editQuoteByIndex(idx) {
-    var q = quotesCache[idx];
-    if (!q) return;
-    editQuote(q);
-}
-
-function printQuoteByIndex(idx) {
-    var q = quotesCache[idx];
-    if (!q) return;
-    var merged = Object.assign({}, q, {
-        quote_number: document.getElementById("quote_number").value || q.quote_number || null,
-        issue_date: document.getElementById("issue_date").value || q.issue_date || null,
-        prepared_by: document.getElementById("prepared_by").value || q.prepared_by || null,
-        company_name: document.getElementById("company_name").value || q.company_name || null,
-        company_abn: document.getElementById("company_abn").value || q.company_abn || null,
-        company_address: document.getElementById("company_address").value || q.company_address || null,
-        company_phone: document.getElementById("company_phone").value || q.company_phone || null,
-        company_email: document.getElementById("company_email").value || q.company_email || null,
-        contact_person: document.getElementById("contact_person").value || q.contact_person || null,
-        client_email: document.getElementById("client_email").value || q.client_email || null,
-        client_phone: document.getElementById("client_phone").value || q.client_phone || null,
-        start_date: document.getElementById("start_date").value || q.start_date || null,
-        end_date: document.getElementById("end_date").value || q.end_date || null,
-        pickup_location: document.getElementById("pickup_location").value || q.pickup_location || null,
-        dropoff_location: document.getElementById("dropoff_location").value || q.dropoff_location || null,
-        vehicle_type: document.getElementById("vehicle_type").value || q.vehicle_type || null,
-        pax_adult: val("pax_adult") || q.pax_adult || null,
-        pax_child: val("pax_child") || q.pax_child || null,
-        pax_tc: val("pax_tc") || q.pax_tc || null,
-        pax_foc: val("pax_foc") || q.pax_foc || null,
-        gst_included: document.getElementById("gst_included").checked,
-        gst_amount: gst_amount,
-        total_incl_gst: total_incl_gst,
-        payment_terms: document.getElementById("payment_terms").value || q.payment_terms || null,
-        cancellation_policy: document.getElementById("cancellation_policy").value || q.cancellation_policy || null,
-        valid_until: document.getElementById("valid_until").value || q.valid_until || null,
-        notes: document.getElementById("notes").value || q.notes || null
+  render() {
+    const grid  = document.getElementById('preview-grid');
+    const count = document.getElementById('photo-count');
+    grid.innerHTML = '';
+    this._files.forEach((f, i) => {
+      const url  = URL.createObjectURL(f);
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      item.innerHTML =
+        '<img src="' + url + '" alt="영수증">' +
+        '<button class="rm" onclick="Photos.remove(' + i + ')">✕</button>';
+      grid.appendChild(item);
     });
-    printQuote(merged);
-}
+    count.innerText = this._files.length > 0
+      ? this._files.length + '장 선택됨' : '';
+  },
 
-function editQuote(q) {
-    editingId = q.id;
+  getFiles() { return this._files; }
+};
 
-    document.getElementById("quote_number").value = q.quote_number || "";
-    document.getElementById("issue_date").value = q.issue_date || "";
-    document.getElementById("prepared_by").value = q.prepared_by || "";
-    
-    document.getElementById("company_name").value = q.company_name || "";
-    document.getElementById("company_abn").value = q.company_abn || "";
-    document.getElementById("company_address").value = q.company_address || "";
-    document.getElementById("company_phone").value = q.company_phone || "";
-    document.getElementById("company_email").value = q.company_email || "";
-    
-    document.getElementById("agency").value = q.agency || "";
-    document.getElementById("contact_person").value = q.contact_person || "";
-    document.getElementById("client_email").value = q.client_email || "";
-    document.getElementById("client_phone").value = q.client_phone || "";
-    
-    document.getElementById("tour_name").value = q.tour_name || "";
-    document.getElementById("start_date").value = q.start_date || "";
-    document.getElementById("end_date").value = q.end_date || "";
-    document.getElementById("pickup_location").value = q.pickup_location || "";
-    document.getElementById("dropoff_location").value = q.dropoff_location || "";
-    document.getElementById("vehicle_type").value = q.vehicle_type || "";
-    document.getElementById("pax").value = q.pax || "";
-    document.getElementById("pax_adult").value = q.pax_adult || "";
-    document.getElementById("pax_child").value = q.pax_child || "";
-    document.getElementById("pax_tc").value = q.pax_tc || "";
-    document.getElementById("pax_foc").value = q.pax_foc || "";
+// =====================================================
+// 💾 Draft (오프라인 임시저장)
+// =====================================================
+const Draft = {
+  save() {
+    localStorage.setItem(OFFLINE_KEY, JSON.stringify({
+      endTime: document.getElementById('end-time').value,
+      notes:   document.getElementById('notes').value,
+      photoCount: Photos.getFiles().length
+    }));
+  },
 
-    document.getElementById("hotel_cost").value = q.hotel_cost || "";
-    document.getElementById("transport_cost").value = q.transport_cost || "";
-    document.getElementById("meal_cost").value = q.meal_cost || "";
-    document.getElementById("attraction_cost").value = q.attraction_cost || "";
-    document.getElementById("guide_cost").value = q.guide_cost || "";
-    document.getElementById("other_cost").value = q.other_cost || "";
+  load() {
+    try {
+      const d = JSON.parse(localStorage.getItem(OFFLINE_KEY) || 'null');
+      if (!d) return;
+      if (d.endTime) {
+        document.getElementById('end-time').value = d.endTime;
+        const btn = document.getElementById('end-btn');
+        btn.disabled = true;
+        btn.innerText = '투어 종료 완료';
+      }
+      if (d.notes) document.getElementById('notes').value = d.notes;
+    } catch (e) {}
+  },
 
-    document.getElementById("selling_price").value = q.selling_price || "";
-    document.getElementById("shopping_revenue").value = q.shopping_revenue || "";
-    
-    document.getElementById("gst_included").checked = q.gst_included || false;
-    document.getElementById("payment_terms").value = q.payment_terms || "";
-    document.getElementById("cancellation_policy").value = q.cancellation_policy || "";
-    document.getElementById("valid_until").value = q.valid_until || "";
-    document.getElementById("notes").value = q.notes || "";
+  clear() { localStorage.removeItem(OFFLINE_KEY); }
+};
 
-    calculate();
-    showMsg("Editing: " + (q.tour_name || "quote"), "info");
-    document.getElementById("editing-label").innerText = "Editing: " + (q.tour_name || "quote");
-    document.getElementById("editing-banner").classList.add("show");
-    document.getElementById("form-section").classList.add("editing-highlight");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-}
+// =====================================================
+// 📤 Report
+// =====================================================
+const Report = {
+  captureEndTime() {
+    const now = new Date();
+    const t   = now.toLocaleTimeString('ko-KR', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    document.getElementById('end-time').value = t;
+    const btn = document.getElementById('end-btn');
+    btn.disabled  = true;
+    btn.innerText = '투어 종료 완료';
+    Draft.save();
+  },
 
-async function deleteQuote(id) {
-    if (!confirm("Delete this quote?")) return;
+  async submit() {
+    const submitBtn = document.getElementById('submit-btn');
+    const endTime   = document.getElementById('end-time').value;
+    const notes     = document.getElementById('notes').value.trim();
+    const files     = Photos.getFiles();
 
-    showMsg("Deleting...", "info");
+    // 검증
+    if (!endTime) {
+      alert('종료 시간을 먼저 기록해주세요.');
+      return;
+    }
+
+    // 오프라인 차단
+    if (!navigator.onLine) {
+      alert('오프라인 상태입니다. 인터넷 연결 후 다시 시도하세요.');
+      return;
+    }
+
+    submitBtn.disabled  = true;
+    submitBtn.innerText = '제출 중...';
+
+    // 진행률 바 표시
+    const progressWrap  = document.getElementById('progress-wrap');
+    const progressFill  = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-label');
+    progressWrap.style.display = 'block';
 
     try {
-        var res = await fetch(SUPABASE_URL + "/rest/v1/quotes?id=eq." + id, {
-            method: "DELETE",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY
-            }
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) throw new Error('로그인이 필요합니다.');
+
+      // ── 1. 이미지 순차 업로드 ──────────────────────
+      const receiptUrls = [];
+      for (let i = 0; i < files.length; i++) {
+        const pct   = Math.round(((i) / (files.length || 1)) * 80);
+        progressFill.style.width  = pct + '%';
+        progressLabel.innerText   = '이미지 업로드 중 (' + (i + 1) + '/' + files.length + ')...';
+
+        const ext  = files[i].name.split('.').pop();
+        const path = user.id + '/' + Date.now() + '_' + i + '.' + ext;
+
+        const { error: upErr } = await sb.storage
+          .from(STORAGE_BUCKET)
+          .upload(path, files[i], { upsert: false });
+
+        if (upErr) throw new Error('이미지 업로드 실패: ' + upErr.message);
+
+        const { data: urlData } = sb.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(path);
+
+        receiptUrls.push(urlData.publicUrl);
+      }
+
+      // ── 2. DB INSERT ────────────────────────────────
+      progressFill.style.width  = '90%';
+      progressLabel.innerText   = '데이터 저장 중...';
+
+      const { error: dbErr } = await sb
+        .from('reports')
+        .insert({
+          guide_id:        user.id,
+          actual_end_time: endTime,
+          receipt_urls:    receiptUrls,
+          notes:           notes || null
         });
 
-        if (!res.ok) {
-            showMsg("Delete failed: " + res.status, "error");
-            return;
-        }
+      if (dbErr) throw new Error('DB 저장 실패: ' + dbErr.message);
 
-        showMsg("Deleted", "success");
-        loadQuotes();
+      // ── 3. 완료 ─────────────────────────────────────
+      progressFill.style.width  = '100%';
+      progressLabel.innerText   = '완료!';
+
+      Draft.clear();
+
+      const now = new Date();
+      document.getElementById('success-detail').innerText =
+        '종료 시간: ' + endTime +
+        '  |  영수증 ' + receiptUrls.length + '장' +
+        '  |  ' + now.toLocaleDateString('ko-KR');
+
+      setTimeout(() => {
+        document.getElementById('report-screen').style.display  = 'none';
+        document.getElementById('success-screen').style.display = 'block';
+      }, 600);
+
     } catch (err) {
-        showMsg("Delete error: " + err.message, "error");
+      console.error('제출 실패:', err);
+      alert('전송 실패: ' + err.message + '\n관리자에게 문의하세요.');
+      submitBtn.disabled  = false;
+      submitBtn.innerText = '최종 제출';
+      progressWrap.style.display = 'none';
     }
-}
+  },
 
-function formatDate(dateStr) {
-    if (!dateStr) return "";
-    var date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("en-AU", { year: "numeric", month: "short", day: "numeric" });
-}
+  reset() {
+    document.getElementById('end-time').value = '';
+    document.getElementById('notes').value    = '';
+    document.getElementById('end-btn').disabled  = false;
+    document.getElementById('end-btn').innerText = '🔴 투어 종료 (Turn off)';
+    document.getElementById('submit-btn').disabled  = false;
+    document.getElementById('submit-btn').innerText = '최종 제출';
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('preview-grid').innerHTML = '';
+    document.getElementById('photo-count').innerText  = '';
+    Photos._files = [];
+    document.getElementById('success-screen').style.display = 'none';
+    document.getElementById('report-screen').style.display  = 'block';
+  }
+};
 
-function printQuote(q) {
-    var today = new Date().toLocaleDateString("en-AU", { year: "numeric", month: "short", day: "numeric" });
+// =====================================================
+// 🌐 오프라인 감지
+// =====================================================
+window.addEventListener('offline', () => {
+  document.getElementById('offline-banner').style.display = 'block';
+  Draft.save();
+});
+window.addEventListener('online', () => {
+  document.getElementById('offline-banner').style.display = 'none';
+});
 
-    var companyName = q.company_name || "Tour Operations";
-    var companyAbn = q.company_abn || "";
-    var companyAddr = q.company_address || "Sydney, Australia";
-    var companyPhone = q.company_phone || "";
-    var companyEmail = q.company_email || "";
-
-    var quoteNum = q.quote_number || "Q-" + new Date().getTime().toString().slice(-6);
-    var issueDate = q.issue_date ? formatDate(q.issue_date) : today;
-    var validUntil = q.valid_until ? formatDate(q.valid_until) : formatDate(getDatePlus30Days());
-    var preparedBy = q.prepared_by || "";
-
-    var agency = q.agency || "";
-    var contactPerson = q.contact_person || "";
-    var clientEmail = q.client_email || "";
-    var clientPhone = q.client_phone || "";
-
-    var tourName = q.tour_name || "Untitled Tour";
-    var startDate = q.start_date ? formatDate(q.start_date) : "";
-    var endDate = q.end_date ? formatDate(q.end_date) : "";
-    var pickupLoc = q.pickup_location || "";
-    var dropoffLoc = q.dropoff_location || "";
-    var vehicleType = q.vehicle_type || "";
-    var totalPax = q.pax || 0;
-    var paxAdult = q.pax_adult || 0;
-    var paxChild = q.pax_child || 0;
-    var paxTc = q.pax_tc || 0;
-    var paxFoc = q.pax_foc || 0;
-
-    var paymentTerms = q.payment_terms || "50% deposit upon confirmation. Balance due 7 days prior.";
-    var cancellationPolicy = q.cancellation_policy || "Full refund 14+ days prior. 50% within 7-13 days.";
-    var notes = q.notes || "";
-
-    var gstAmount = q.gst_amount || 0;
-    var totalInclGst = q.total_incl_gst || q.total_revenue || 0;
-    var finalTotal = q.gst_included ? totalInclGst : (q.total_revenue || 0);
-
-    // Cost items - only non-zero
-    var costItems = [];
-    if (q.hotel_cost) costItems.push({name: "Hotel / Accommodation", amount: q.hotel_cost});
-    if (q.transport_cost) costItems.push({name: "Transport", amount: q.transport_cost});
-    if (q.meal_cost) costItems.push({name: "Meals", amount: q.meal_cost});
-    if (q.attraction_cost) costItems.push({name: "Attractions", amount: q.attraction_cost});
-    if (q.guide_cost) costItems.push({name: "Guide", amount: q.guide_cost});
-    if (q.other_cost) costItems.push({name: "Other", amount: q.other_cost});
-
-    var costRows = "";
-    for (var i = 0; i < costItems.length; i++) {
-        costRows += '<tr><td>' + costItems[i].name + '</td><td class="amt">$' + costItems[i].amount.toFixed(2) + '</td></tr>';
-    }
-    costRows += '<tr class="row-total"><td>Total Cost</td><td class="amt">$' + (q.total_cost || 0).toFixed(2) + '</td></tr>';
-
-    // Revenue items
-    var revRows = '';
-    revRows += '<tr><td>Selling Price</td><td class="amt">$' + (q.selling_price || 0).toFixed(2) + '</td></tr>';
-    if (q.shopping_revenue) {
-        revRows += '<tr><td>Shopping Revenue</td><td class="amt">$' + q.shopping_revenue.toFixed(2) + '</td></tr>';
-    }
-    revRows += '<tr class="row-total"><td>Total Revenue</td><td class="amt">$' + (q.total_revenue || 0).toFixed(2) + '</td></tr>';
-    if (q.gst_included) {
-        revRows += '<tr><td>GST (10%)</td><td class="amt">$' + gstAmount.toFixed(2) + '</td></tr>';
-    }
-
-    // Event details - only non-empty
-    var eventRows = '';
-    eventRows += '<tr><td class="el">Tour</td><td>' + tourName + '</td></tr>';
-    if (startDate || endDate) eventRows += '<tr><td class="el">Dates</td><td>' + (startDate || "TBC") + ' \u2014 ' + (endDate || "TBC") + '</td></tr>';
-    if (totalPax) {
-        var paxStr = totalPax + ' total';
-        var parts = [];
-        if (paxAdult) parts.push(paxAdult + ' adult');
-        if (paxChild) parts.push(paxChild + ' child');
-        if (paxTc) parts.push(paxTc + ' TC');
-        if (paxFoc) parts.push(paxFoc + ' FOC');
-        if (parts.length) paxStr += ' (' + parts.join(', ') + ')';
-        eventRows += '<tr><td class="el">Pax</td><td>' + paxStr + '</td></tr>';
-    }
-    if (pickupLoc) eventRows += '<tr><td class="el">Pickup</td><td>' + pickupLoc + '</td></tr>';
-    if (dropoffLoc) eventRows += '<tr><td class="el">Drop-off</td><td>' + dropoffLoc + '</td></tr>';
-    if (vehicleType) eventRows += '<tr><td class="el">Vehicle</td><td>' + vehicleType + '</td></tr>';
-
-    // Company lines - hide empty
-    var companyBlock = '<div class="co-name">' + companyName + '</div>';
-    if (companyAbn) companyBlock += '<div class="co-detail">' + companyAbn + '</div>';
-    companyBlock += '<div class="co-detail">' + companyAddr + '</div>';
-    if (companyPhone || companyEmail) {
-        var contactParts = [];
-        if (companyPhone) contactParts.push(companyPhone);
-        if (companyEmail) contactParts.push(companyEmail);
-        companyBlock += '<div class="co-detail">' + contactParts.join(' | ') + '</div>';
-    }
-
-    // Client block - hide empty
-    var clientBlock = '';
-    if (agency) clientBlock += '<div class="cl-name">' + agency + '</div>';
-    if (contactPerson) clientBlock += '<div class="cl-detail">' + contactPerson + '</div>';
-    if (clientEmail || clientPhone) {
-        var clParts = [];
-        if (clientEmail) clParts.push(clientEmail);
-        if (clientPhone) clParts.push(clientPhone);
-        clientBlock += '<div class="cl-detail">' + clParts.join(' | ') + '</div>';
-    }
-    if (!clientBlock) clientBlock = '<div class="cl-detail" style="color:#94a3b8;">To be confirmed</div>';
-
-    // Status mapping for PDF
-    var pdfStatus = mapStatusDisplay(q.status);
-    var statusLabel = pdfStatus.label;
-    var statusCls = pdfStatus.cls;
-
-    var printContent =
-        '<!DOCTYPE html><html><head><title>Quotation - ' + tourName + '</title>' +
-        '<style>' +
-        '@page { size: A4; margin: 10mm 14mm; }' +
-        '* { box-sizing: border-box; margin: 0; padding: 0; }' +
-        'body { font-family: "Segoe UI", -apple-system, Arial, sans-serif; color: #1e293b; font-size: 11px; line-height: 1.35; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
-        '.page { width: 100%; }' +
-
-        /* Header */
-        '.header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 2.5px solid #1e40af; }' +
-        '.co-name { font-size: 18px; font-weight: 700; color: #1e40af; margin-bottom: 3px; }' +
-        '.co-detail { font-size: 9.5px; color: #64748b; line-height: 1.5; }' +
-        '.q-title { text-align: right; }' +
-        '.q-title h1 { font-size: 24px; color: #1e40af; font-weight: 800; letter-spacing: 2px; margin-bottom: 3px; }' +
-        '.q-num { font-size: 13px; font-weight: 700; color: #1e293b; background: #dbeafe; display: inline-block; padding: 2px 8px; border-radius: 3px; }' +
-        '.q-date { font-size: 9px; color: #64748b; margin-top: 2px; }' +
-
-        /* Info row */
-        '.info-row { display: flex; gap: 10px; margin-bottom: 10px; }' +
-        '.info-card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 8px 10px; }' +
-        '.info-card h3 { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; font-weight: 700; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px solid #e2e8f0; }' +
-        '.cl-name { font-size: 11px; font-weight: 600; color: #1e293b; }' +
-        '.cl-detail { font-size: 10px; color: #475569; line-height: 1.5; }' +
-        '.info-card .meta { font-size: 10px; color: #475569; line-height: 1.6; }' +
-        '.info-card .meta .lbl { color: #64748b; font-size: 9px; }' +
-
-        /* Section label */
-        '.sec { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #1e40af; font-weight: 700; margin: 10px 0 5px 0; padding-bottom: 3px; border-bottom: 1px solid #e2e8f0; }' +
-
-        /* Tables */
-        'table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }' +
-        'th { background: #1e40af; color: white; padding: 5px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }' +
-        'th:last-child { text-align: right; }' +
-        'td { padding: 5px 10px; border-bottom: 1px solid #e8ecf0; font-size: 11px; }' +
-        'td.amt { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }' +
-        'td.el { color: #64748b; font-size: 10px; width: 80px; }' +
-        'tr:nth-child(even) { background: #f8fafc; }' +
-        '.row-total { background: #eef2ff !important; font-weight: 700; }' +
-        '.row-total td { border-top: 1.5px solid #a5b4fc; }' +
-
-        /* Event table */
-        '.ev-table td { padding: 4px 10px; font-size: 11px; border-bottom: 1px solid #f1f5f9; }' +
-        '.ev-table tr:nth-child(even) { background: transparent; }' +
-
-        /* Total banner */
-        '.total-banner { background: linear-gradient(135deg, #1e40af, #1a56db); color: white; padding: 12px 18px; border-radius: 5px; margin: 8px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }' +
-        '.total-banner .t-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; opacity: 0.9; }' +
-        '.total-banner .t-amount { font-size: 22px; font-weight: 800; }' +
-
-        /* Margin */
-        '.margin-strip { display: flex; gap: 10px; margin-bottom: 8px; }' +
-        '.m-card { flex: 1; border-radius: 5px; padding: 7px 10px; text-align: center; }' +
-        '.m-card.good { background: #f0fdf4; border: 1px solid #86efac; }' +
-        '.m-card.risk { background: #fffbeb; border: 1px solid #fcd34d; }' +
-        '.m-card.bad { background: #fef2f2; border: 1px solid #fca5a5; }' +
-        '.m-card .m-lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }' +
-        '.m-card .m-val { font-size: 15px; font-weight: 700; margin-top: 1px; }' +
-        '.m-card .m-val.good { color: #16a34a; }' +
-        '.m-card .m-val.risk { color: #d97706; }' +
-        '.m-card .m-val.bad { color: #dc2626; }' +
-
-        /* Terms */
-        '.terms-strip { display: flex; gap: 10px; margin-bottom: 6px; }' +
-        '.t-card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px; }' +
-        '.t-card .t-lbl { font-size: 8px; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px; }' +
-        '.t-card .t-val { font-size: 9.5px; color: #334155; line-height: 1.3; }' +
-
-        /* Notes */
-        '.notes { padding: 6px 8px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 3px; font-size: 9.5px; color: #92400e; margin-bottom: 6px; }' +
-
-        /* Footer */
-        '.footer { padding-top: 6px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 8px; color: #94a3b8; }' +
-
-        '@media print { body { padding: 0; } }' +
-        '</style></head><body><div class="page">' +
-
-        /* Header */
-        '<div class="header">' +
-        '<div>' + companyBlock + '</div>' +
-        '<div class="q-title">' +
-        '<h1>QUOTATION</h1>' +
-        '<div class="q-num">' + quoteNum + '</div>' +
-        '<div class="q-date">' + issueDate + '</div>' +
-        '</div></div>' +
-
-        /* Info row */
-        '<div class="info-row">' +
-        '<div class="info-card"><h3>Prepared For</h3>' + clientBlock + '</div>' +
-        '<div class="info-card"><h3>Quote Details</h3><div class="meta">' +
-        (preparedBy ? '<span class="lbl">By:</span> ' + preparedBy + '<br>' : '') +
-        '<span class="lbl">Issued:</span> ' + issueDate + '<br>' +
-        '<span class="lbl">Valid Until:</span> <strong>' + validUntil + '</strong>' +
-        '</div></div></div>' +
-
-        /* Event details */
-        '<div class="sec">Event Details</div>' +
-        '<table class="ev-table"><tbody>' + eventRows + '</tbody></table>' +
-
-        /* Cost breakdown */
-        '<div class="sec">Cost Breakdown</div>' +
-        '<table><thead><tr><th>Item</th><th>Amount (AUD)</th></tr></thead><tbody>' +
-        costRows +
-        '</tbody></table>' +
-
-        /* Revenue */
-        '<div class="sec">Revenue</div>' +
-        '<table><thead><tr><th>Item</th><th>Amount (AUD)</th></tr></thead><tbody>' +
-        revRows +
-        '</tbody></table>' +
-
-        /* Total banner */
-        '<div class="total-banner">' +
-        '<div class="t-label">Total Amount' + (q.gst_included ? ' (incl. GST)' : '') + '</div>' +
-        '<div class="t-amount">AUD $' + finalTotal.toFixed(2) + '</div>' +
-        '</div>' +
-
-        /* Margin */
-        '<div class="margin-strip">' +
-        '<div class="m-card ' + statusCls + '">' +
-        '<div class="m-lbl">Margin</div>' +
-        '<div class="m-val ' + statusCls + '">$' + (q.margin || 0).toFixed(2) + ' (' + (q.margin_rate ? q.margin_rate.toFixed(1) : "0.0") + '%)</div>' +
-        '</div>' +
-        '<div class="m-card ' + statusCls + '">' +
-        '<div class="m-lbl">Status</div>' +
-        '<div class="m-val ' + statusCls + '">' + statusLabel + '</div>' +
-        '</div></div>' +
-
-        /* Terms */
-        '<div class="terms-strip">' +
-        '<div class="t-card"><div class="t-lbl">Payment Terms</div><div class="t-val">' + paymentTerms + '</div></div>' +
-        '<div class="t-card"><div class="t-lbl">Cancellation</div><div class="t-val">' + cancellationPolicy + '</div></div>' +
-        '</div>' +
-
-        /* Notes */
-        (notes ? '<div class="notes"><strong>Notes:</strong> ' + notes.replace(/\n/g, ' ') + '</div>' : '') +
-
-        /* Footer */
-        '<div class="footer">Valid until ' + validUntil + ' | All prices in AUD | ' + companyName + '</div>' +
-
-        '</div></body></html>';
-
-    var w = window.open("", "_blank");
-    if (!w) {
-        showMsg("Pop-up blocked. Allow pop-ups for PDF.", "error");
-        return;
-    }
-    w.document.write(printContent);
-    w.document.close();
-    w.focus();
-    setTimeout(function() { w.print(); }, 300);
-}
-
-function clearForm() {
-    editingId = null;
-    document.querySelectorAll("input[type='text'], input[type='number'], input[type='date'], textarea").forEach(function(i) { i.value = ""; });
-    document.querySelectorAll("input[type='checkbox']").forEach(function(i) { i.checked = false; });
-    document.getElementById("result").innerHTML = "";
-    document.getElementById("result").classList.remove("show");
-    document.getElementById("message").innerText = "";
-    document.getElementById("message").className = "";
-    document.getElementById("form-section").classList.remove("editing-highlight");
-    document.getElementById("editing-banner").classList.remove("show");
-}
-
-// Export as JSON backup
-function exportBackup() {
-    if (quotesCache.length === 0) {
-        showMsg("No data to export. Load quotes first.", "error");
-        return;
-    }
-    var blob = new Blob([JSON.stringify(quotesCache, null, 2)], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "quotes_backup_" + new Date().toISOString().slice(0,10) + ".json";
-    a.click();
-    URL.revokeObjectURL(url);
-    showMsg("Backup downloaded", "success");
-}
-
-loadQuotes();
+// =====================================================
+// 🚀 초기화
+// =====================================================
+Auth.init();
 </script>
+
 </body>
 </html>
