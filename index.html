@@ -3,898 +3,1211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>가이드 리포트</title>
-  <!-- Supabase JS SDK -->
+  <title>TourFlow Guide</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { background: #f2f2f7; }
-    body {
-      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #fff;
-      min-height: 100vh;
-      color: #1c1c1e;
-      line-height: 1.45;
-      padding: 24px 16px 32px;
+    :root {
+      --bg: #f2f2f7; --card: #fff; --border: #e5e5ea;
+      --text: #1c1c1e; --sub: #6a6a70; --accent: #1c1c1e;
+      --green: #34c759; --red: #ff3b30; --blue: #007aff; --orange: #ff9500;
     }
-    .app-shell {
-      max-width: 540px;
-      margin: 0 auto;
-    }
-    .screen {
-      background: #f2f2f7;
-      border-radius: 30px;
-      padding: 20px 0 0;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-    }
-    .card {
-      background: #fff;
-      border-radius: 28px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-      margin: 0 16px 16px;
-      overflow: hidden;
-    }
-    .card-header {
-      padding: 18px 18px 12px;
-      border-bottom: 1px solid #e5e5ea;
-    }
-    .card-body {
-      padding: 0 18px 18px;
-    }
-    h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #1c1c1e;
-      letter-spacing: -0.02em;
-      margin-bottom: 4px;
-    }
-    h3 {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #6a6a70;
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: #6a6a70;
-      margin: 18px 0 8px;
-    }
-    .field { margin-bottom: 16px; }
-    .field label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #3c3c43;
-      margin-bottom: 6px;
-    }
-    .field input[type=text],
-    .field input[type=email],
-    .field input[type=password],
-    .field textarea {
-      width: 100%;
-      padding: 14px 14px;
-      border: 1px solid #d1d1d6;
-      border-radius: 16px;
-      font-size: 16px;
-      font-family: inherit;
-      background: #f7f7f7;
-      color: #1c1c1e;
-    }
-    .field input[readonly] {
-      background: #f2f2f7;
-      color: #3c3c43;
-    }
-    .field textarea { resize: vertical; min-height: 88px; }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #8e8e93;
-      box-shadow: 0 0 0 2px rgba(60,60,67,0.12);
-    }
-    .photo-btns { display: flex; gap: 10px; margin-bottom: 12px; }
-    .photo-btns button {
-      flex: 1;
-      padding: 14px 12px;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      touch-action: manipulation;
-      background: #1c1c1e;
-      color: #fff;
-      transition: opacity 0.2s ease;
-    }
-    .photo-btns button:active { opacity: .82; }
+    html, body { background: var(--bg); font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text); min-height: 100vh; }
+    body { padding-bottom: 80px; }
+
+    /* NAV BAR */
+    .navbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 200; }
+    .navbar-brand { font-size: 13px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+    .navbar-user { font-size: 12px; color: var(--sub); }
+    .btn-sm { padding: 7px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    /* BOTTOM TAB */
+    .bottom-tab { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; z-index: 200; }
+    .tab-btn { flex: 1; padding: 10px 0 14px; border: none; background: transparent; font-size: 10px; font-weight: 600; color: var(--sub); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .tab-btn.active { color: var(--accent); }
+    .tab-btn .icon { font-size: 22px; }
+
+    /* SCREENS */
+    .screen { display: none; max-width: 560px; margin: 0 auto; padding: 16px 14px; }
+    .screen.active { display: block; }
+
+    /* CARDS */
+    .card { background: var(--card); border-radius: 18px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .card-title { font-size: 15px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--sub); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--bg); }
+
+    /* FIELDS */
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; font-weight: 600; color: var(--sub); margin-bottom: 5px; }
+    .field input, .field select, .field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e5; border-radius: 12px; background: #f7f7f9; font-size: 15px; color: var(--text); font-family: inherit; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+    .field textarea { min-height: 80px; resize: vertical; }
+
+    /* BUTTONS */
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-bottom: 8px; }
+    .btn:hover { opacity: .88; }
+    .btn-dark { background: var(--accent); color: #fff; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .btn-grey { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-orange { background: var(--orange); color: #fff; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-row .btn { flex: 1; }
+
+    /* LOGIN */
+    #login-screen { max-width: 400px; margin: 60px auto; padding: 20px 16px; }
+    .login-card { background: var(--card); border-radius: 24px; padding: 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    .login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .login-card p { color: var(--sub); font-size: 14px; margin-bottom: 20px; }
+    #login-msg { font-size: 13px; color: var(--red); margin-top: 8px; }
+
+    /* CALENDAR STRIP */
+    .cal-strip { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
+    .cal-strip::-webkit-scrollbar { display: none; }
+    .cal-day { min-width: 48px; padding: 8px 6px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card); text-align: center; cursor: pointer; flex-shrink: 0; }
+    .cal-day.today { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .cal-day.has-tour { border-color: var(--blue); }
+    .cal-day.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .cal-day .dow { font-size: 10px; font-weight: 600; opacity: .7; }
+    .cal-day .date { font-size: 16px; font-weight: 800; margin: 2px 0; }
+    .cal-day .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); margin: 0 auto; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-card { background: #f7f7f9; border-radius: 12px; padding: 10px; text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 800; }
+    .stat-lbl { font-size: 10px; color: var(--sub); margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
+
+    /* TOUR CARD */
+    .tour-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color .2s; }
+    .tour-card:hover { border-color: var(--blue); }
+    .tour-card.selected { border-color: var(--accent); background: #f7f7f9; }
+    .tour-card-name { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+    .tour-card-meta { font-size: 13px; color: var(--sub); display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+
+    /* TOUR DETAIL */
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f7f7f9; font-size: 14px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: var(--sub); font-size: 13px; }
+    .info-row .val { font-weight: 600; }
+
+    .checklist-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f7f7f9; border-radius: 10px; margin-bottom: 6px; }
+    .checklist-item .name { font-size: 14px; font-weight: 600; }
+    .checklist-item .time { font-size: 13px; color: var(--sub); }
+    .check-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .check-btn.checked { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* ROUTE SELECT */
+    .route-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .route-btn { padding: 12px; border-radius: 12px; border: 2px solid var(--border); background: #fff; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; transition: all .2s; }
+    .route-btn.selected { border-color: var(--blue); background: #dbeafe; color: #1d4ed8; }
+
+    /* ALERT BTN */
+    .alert-btn { width: 100%; padding: 13px; border: none; border-radius: 13px; font-size: 14px; font-weight: 700; cursor: pointer; background: #fff3cd; color: #856404; border: 1px solid #ffc107; margin-bottom: 8px; }
+    .alert-btn:hover { background: #ffc107; color: #fff; }
+
+    /* SHOPPING INPUT */
+    .shop-row { background: #f7f7f9; border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+    .shop-row-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .shop-type { font-size: 13px; font-weight: 700; }
+    .shop-planned { font-size: 12px; color: var(--sub); }
+    .shop-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .shop-input-wrap span { font-size: 13px; color: var(--sub); white-space: nowrap; }
+    .shop-input { flex: 1; padding: 10px 12px; border: 1.5px solid #e0e0e5; border-radius: 10px; background: #fff; font-size: 16px; font-weight: 700; color: var(--text); }
+    .shop-input:focus { outline: none; border-color: var(--green); }
+    .shop-total-row { display: flex; justify-content: space-between; padding: 10px 12px; background: #f0fdf4; border-radius: 10px; margin-top: 8px; }
+    .shop-total-row .lbl { font-size: 13px; font-weight: 700; }
+    .shop-total-row .val { font-size: 16px; font-weight: 800; color: #127a35; }
+
+    /* REPORT TABLE */
+    .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .report-table th { background: var(--accent); color: #fff; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    .report-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f5; }
+    .report-table tr:hover td { background: #f7f7f9; }
+    .report-table .end-row td { background: #f0fdf4; font-weight: 700; border-top: 2px solid var(--green); }
+    .report-table .margin-cell { background: #dbeafe; color: #1d4ed8; font-weight: 800; border-radius: 8px; padding: 4px 8px; display: inline-block; }
+
+    /* PERIOD TOTALS */
+    .period-card { background: linear-gradient(135deg, #1c1c1e, #3c3c43); color: #fff; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .period-card .p-label { font-size: 11px; opacity: .7; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .period-card .p-val { font-size: 24px; font-weight: 800; }
+    .period-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .period-item { background: rgba(255,255,255,.1); border-radius: 10px; padding: 10px; }
+    .period-item .pi-lbl { font-size: 10px; opacity: .7; text-transform: uppercase; }
+    .period-item .pi-val { font-size: 16px; font-weight: 800; margin-top: 2px; }
+
+    /* PHOTO */
+    .photo-btns { display: flex; gap: 8px; margin-bottom: 10px; }
+    .photo-btns button { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; background: var(--accent); color: #fff; }
     input[type=file] { display: none; }
-    .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-    .preview-item {
-      position: relative;
-      width: 82px;
-      height: 82px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid #d1d1d6;
-      background: #f7f7f7;
-    }
-    .preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .preview-item .rm {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(28,28,30,0.82);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 13px;
-      cursor: pointer;
-      line-height: 24px;
-      text-align: center;
-      padding: 0;
-    }
-    .photo-count {
-      font-size: 12px;
-      color: #6a6a70;
-      margin-top: 8px;
-    }
-    .progress-wrap { margin: 16px 0 0; display: none; }
-    .progress-bar-bg {
-      background: #e5e5ea;
-      border-radius: 999px;
-      height: 10px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      background: #1c1c1e;
-      height: 100%;
-      width: 0%;
-      transition: width .3s ease;
-      border-radius: 999px;
-    }
-    .progress-label {
-      font-size: 12px;
-      color: #6a6a70;
-      margin-top: 8px;
-    }
-    #offline-banner {
-      display: none;
-      background: #f2f2f7;
-      color: #3c3c43;
-      border: 1px solid #d1d1d6;
-      font-size: 13px;
-      padding: 12px 14px;
-      border-radius: 18px;
-      margin: 0 16px 14px;
-    }
-    .btn-end,
-    .btn-submit,
-    .btn-login,
-    .btn-new {
-      width: 100%;
-      padding: 16px 0;
-      border: none;
-      border-radius: 18px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-      background: #1c1c1e;
-      color: #fff;
-      transition: opacity .2s ease;
-    }
-    .btn-end { margin-bottom: 10px; }
-    .btn-end:not(:disabled):active,
-    .btn-submit:not(:disabled):active,
-    .btn-login:not(:disabled):active,
-    .btn-new:not(:disabled):active { opacity: .86; }
-    button:disabled { opacity: .4; cursor: not-allowed; }
-    #auth-screen { max-width: 540px; margin: 40px auto 0; }
-    #auth-screen h2 { text-align: center; margin-bottom: 8px; font-size: 24px; }
-    .auth-msg { font-size: 13px; color: #ff3b30; margin-top: 14px; text-align: center; }
-    #success-screen {
-      display: none;
-      text-align: center;
-      padding: 40px 20px;
-      max-width: 540px;
-      margin: 0 auto;
-    }
-    #success-screen .icon { font-size: 54px; margin-bottom: 16px; }
-    #success-screen p {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1c1c1e;
-      margin: 0 0 8px;
-    }
-    #success-screen small {
-      font-size: 14px;
-      color: #6a6a70;
-    }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 540px;
-      margin: 0 auto 12px;
-      padding: 0 18px;
-    }
-    .topbar span { font-size: 13px; color: #6a6a70; }
-    .btn-logout {
-      padding: 10px 14px;
-      background: #f2f2f7;
-      color: #1c1c1e;
-      border: 1px solid #d1d1d6;
-      border-radius: 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    /* Today View (guide app) */
-    .today-card .meta-row { display:flex; gap:12px; align-items:center; margin-top:6px; }
-    .today-card .stat { background:#f7f7f7; padding:8px 12px; border-radius:12px; text-align:center; }
-    .today-card .stat-num { font-weight:700; font-size:16px; color:#1c1c1e; }
-    .today-card .stat-label { font-size:11px; color:#6a6a70; margin-top:4px; }
+    .preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .preview-item { position: relative; width: 76px; height: 76px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item .rm { position: absolute; top: 4px; right: 4px; background: rgba(28,28,30,.8); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; }
 
-    .grid-overview { margin: 10px 0 16px; }
-    .grid-row { display:flex; gap:10px; }
-    .grid-item { width:56px; height:56px; border-radius:10px; background:#fff; border:1px solid #d1d1d6; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+    /* PROGRESS */
+    .progress-wrap { display: none; margin: 10px 0; }
+    .progress-bg { background: #e5e5ea; border-radius: 999px; height: 8px; overflow: hidden; }
+    .progress-fill { background: var(--green); height: 100%; width: 0%; transition: width .3s; border-radius: 999px; }
+    .progress-lbl { font-size: 12px; color: var(--sub); margin-top: 4px; }
 
-    .today-list { display:flex; flex-direction:column; gap:8px; }
-    .list-item { display:flex; align-items:center; padding:12px; background: #fff; border-radius:12px; border:1px solid #e6e6ea; cursor:pointer; transition: background .2s, border-color .2s; }
-    .list-item.selected { background:#f2f2f7; border-color:#1c1c1e; }
-    .item-left { flex: 1; font-weight:700; color:#1c1c1e; }
-    .item-middle { width:140px; color:#6a6a70; font-size:14px; }
-    .item-right { width:120px; display:flex; gap:8px; justify-content:flex-end; }
-    .item-right .box { width:44px; height:36px; background:#f7f7f7; border-radius:8px; border:1px solid #d1d1d6; }
+    /* SUCCESS */
+    #success-screen { text-align: center; padding: 60px 20px; }
+    .success-icon { font-size: 60px; margin-bottom: 14px; }
+    .success-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .success-sub { font-size: 14px; color: var(--sub); margin-bottom: 28px; }
+
+    /* OFFLINE */
+    .offline-banner { display: none; background: #fff4ce; border: 1px solid #f59e0b; color: #92400e; font-size: 13px; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; }
+
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background: linear-gradient(to bottom, var(--blue), var(--green)); border-radius:2px; }
+    .tl-item { position:relative; margin-bottom:16px; }
+    .tl-dot { position:absolute; left:-20px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--blue); border:2px solid #fff; box-shadow:0 0 0 2px var(--blue); }
+    .tl-dot.done { background:var(--green); box-shadow:0 0 0 2px var(--green); }
+    .tl-dot.current { background:var(--orange); box-shadow:0 0 0 2px var(--orange); animation:pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.3);} }
+    .tl-time { font-size:11px; font-weight:700; color:var(--sub); margin-bottom:2px; }
+    .tl-name { font-size:14px; font-weight:700; color:var(--text); }
+    .tl-meta { font-size:12px; color:var(--sub); margin-top:2px; }
+    .tl-duration { display:inline-block; background:#f0f0f5; border-radius:6px; padding:2px 7px; font-size:11px; font-weight:600; color:var(--sub); margin-top:4px; }
+
+    /* CAPTAIN CARD */
+    .captain-card { background: linear-gradient(135deg, #1c1c1e, #2c2c2e); color:#fff; border-radius:18px; padding:16px; margin-bottom:12px; }
+    .captain-name { font-size:17px; font-weight:800; margin-bottom:4px; }
+    .captain-num { font-size:14px; opacity:.8; margin-bottom:12px; }
+    .captain-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .captain-btn { padding:11px; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; }
+    .captain-btn-sms { background:rgba(255,255,255,.15); color:#fff; }
+    .captain-btn-call { background:var(--green); color:#fff; }
+
+    /* GPS MAP */
+    #gps-map { width:100%; height:260px; border-radius:14px; overflow:hidden; background:#e8e8e8; position:relative; }
+    .map-placeholder { width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--sub);font-size:14px; }
+    .guide-marker { position:absolute; transform:translate(-50%,-50%); text-align:center; }
+    .guide-marker .dot { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.2); }
+    .guide-marker .label { font-size:10px;font-weight:700;background:#fff;border-radius:6px;padding:2px 5px;margin-top:2px;box-shadow:0 1px 3px rgba(0,0,0,.15); }
+
+    /* MESSAGES */
+    .msg-item { padding:12px; background:#f7f7f9; border-radius:12px; margin-bottom:8px; border-left:3px solid var(--blue); }
+    .msg-item.unread { background:#eff6ff; border-left-color:var(--blue); }
+    .msg-item.read { opacity:.7; border-left-color:var(--border); }
+    .msg-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+    .msg-sender { font-size:12px; font-weight:700; color:var(--blue); }
+    .msg-time { font-size:11px; color:var(--sub); }
+    .msg-body { font-size:14px; color:var(--text); line-height:1.5; }
+    .unread-badge { display:inline-block; background:var(--red); color:#fff; border-radius:999px; padding:2px 7px; font-size:11px; font-weight:700; margin-left:6px; }
+
+    /* SHARE MODAL */
+    .modal-overlay { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,.5); z-index:300; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-box { background:#fff; border-radius:24px; padding:24px; max-width:340px; width:90%; text-align:center; }
+    .share-code { font-size:36px; font-weight:900; letter-spacing:8px; color:var(--accent); margin:16px 0; font-family:monospace; }
+    .share-url { font-size:12px; color:var(--sub); background:#f7f7f9; border-radius:8px; padding:8px; margin-bottom:16px; word-break:break-all; }
   </style>
 </head>
 <body>
-<div class="screen">
-  <div class="app-shell">
-    <!-- Landing screen (shown before login) -->
-    <div id="landing-screen" class="card" style="margin-top:12px;">
-      <div class="card-header">
-        <h2>Welcome to TourFlow</h2>
-        <p style="color:#6a6a70;margin-top:6px;font-size:14px;">Select an app to continue</p>
-      </div>
-      <div class="card-body">
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <button onclick="goToGuide()" style="padding:14px;border-radius:14px;background:#1c1c1e;color:#fff;font-weight:700;font-size:16px;">가이드 앱 (Guide)</button>
-          <button onclick="goToQuote()" style="padding:14px;border-radius:14px;background:#f2f2f7;color:#1c1c1e;font-weight:700;font-size:16px;border:1px solid #d1d1d6;">견적 앱 (Quote)</button>
-        </div>
-      </div>
-    </div>
-    <div class="card today-card">
-      <div class="card-header">
-        <h2>Today</h2>
-        <div class="meta-row">
-          <div class="stat"><div class="stat-num">12</div><div class="stat-label">Week</div></div>
-          <div class="stat"><div class="stat-num">5</div><div class="stat-label">Tours</div></div>
-          <div class="stat"><div class="stat-num">2</div><div class="stat-label">Issues</div></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="grid-overview">
-          <div class="grid-row">
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-          </div>
-        </div>
 
-        <div class="section-title">Today</div>
-        <div class="today-list">
-          <div class="list-item">
-            <div class="item-left">홍길동</div>
-            <div class="item-middle">TSIS · 08:00</div>
-            <div class="item-right"><div class="box"></div><div class="box"></div></div>
-          </div>
-          <div class="list-item">
-            <div class="item-left">차미도</div>
-            <div class="item-middle">TSS · 09:30</div>
-            <div class="item-right"><div class="box"></div><div class="box"></div></div>
-          </div>
-          <div class="list-item">
-            <div class="item-left">공로동</div>
-            <div class="item-middle">Resort · 10:00</div>
-            <div class="item-right"><div class="box"></div><div class="box"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- NAVBAR -->
+<div class="navbar" id="navbar" style="display:none;">
+  <div class="navbar-brand">TourFlow</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="navbar-user" id="navbar-user"></span>
+    <button class="btn-sm" onclick="doLogout()">로그아웃</button>
   </div>
+</div>
 
-<!-- ① 로그인 화면 -->
-<div id="auth-screen" style="display:none;">
-  <div class="card">
-    <h2>📋 가이드 리포트 로그인</h2>
+<!-- BOTTOM TAB -->
+<div class="bottom-tab" id="bottom-tab" style="display:none;">
+  <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">
+    <span class="icon">📅</span>Today
+  </button>
+  <button class="tab-btn" id="tab-report" onclick="switchTab('report')">
+    <span class="icon">📋</span>리포트
+  </button>
+  <button class="tab-btn" id="tab-gps" onclick="switchTab('gps')">
+    <span class="icon">📍</span>위치
+  </button>
+  <button class="tab-btn" id="tab-notice" onclick="switchTab('notice')">
+    <span class="icon">📣</span>공지<span class="unread-badge" id="notice-badge" style="display:none;">0</span>
+  </button>
+  <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
+    <span class="icon">📊</span>실적
+  </button>
+</div>
+
+<!-- ① 로그인 -->
+<div id="login-screen">
+  <div class="login-card">
+    <h2>👋 TourFlow</h2>
+    <p>가이드 앱에 로그인하세요.</p>
     <div class="field">
       <label>이메일</label>
-      <input type="email" id="auth-email" placeholder="guide@example.com">
+      <input type="email" id="login-email" placeholder="guide@example.com" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="field">
       <label>비밀번호</label>
-      <input type="password" id="auth-pw" placeholder="••••••••">
+      <input type="password" id="login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-login" onclick="Auth.login()">로그인</button>
-    <p class="auth-msg" id="auth-msg"></p>
+    <button class="btn btn-dark" onclick="doLogin()">로그인</button>
+    <p id="login-msg"></p>
   </div>
 </div>
 
-<!-- ② 리포트 입력 화면 -->
-<div id="report-screen" style="display:none;">
-  <div class="topbar">
-    <span id="user-label">가이드: —</span>
-    <button class="btn-logout" onclick="Auth.logout()">로그아웃</button>
+<!-- ② TODAY 탭 -->
+<div id="screen-today" class="screen">
+  <div class="offline-banner" id="offline-banner">⚠️ 오프라인 상태</div>
+
+  <!-- 날짜 달력 스트립 -->
+  <div class="card" style="padding:14px;">
+    <div class="cal-strip" id="cal-strip"></div>
   </div>
 
-    <div id="selected-tour-box" style="padding:0 18px 12px; color:#1c1c1e; font-size:14px;">
-      선택된 투어: <span id="selected-tour-label">없음</span>
+  <!-- 통계 -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-week">-</div><div class="stat-lbl">이번주</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-today">-</div><div class="stat-lbl">오늘</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-pax">-</div><div class="stat-lbl">인원</div></div>
+  </div>
+
+  <!-- 투어 목록 -->
+  <div id="today-list"><div style="color:var(--sub);text-align:center;padding:32px;">불러오는 중...</div></div>
+
+  <!-- 투어 상세 (선택 시 표시) -->
+  <div id="tour-detail" style="display:none;">
+
+    <!-- 오늘의 캡틴 -->
+    <div class="captain-card" id="captain-card" style="display:none;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.6;text-transform:uppercase;margin-bottom:8px;">오늘의 캡틴</div>
+      <div class="captain-name" id="captain-name">-</div>
+      <div class="captain-num" id="captain-num">-</div>
+      <div class="captain-btns">
+        <button class="captain-btn captain-btn-sms" onclick="sendCaptainSMS('ready')">준비하기시의 SMS</button>
+        <button class="captain-btn captain-btn-sms" onclick="sendCaptainSMS('meeting')">미팅하기시의 SMS</button>
+        <button class="captain-btn captain-btn-call" id="captain-call-btn" onclick="callCaptain()">📞 전화</button>
+        <button class="captain-btn" style="background:rgba(255,255,255,.15);color:#fff;" onclick="shareTourWithCaptain()">🔗 일정 공유</button>
+      </div>
     </div>
-    <!-- 출발 시간 -->
-    <div class="field">
-      <label>예정 출발 시간</label>
-      <input type="text" id="start-time" value="08:00" readonly>
+
+    <!-- 투어 기본 정보 -->
+    <div class="card">
+      <div class="card-title">📋 투어 정보</div>
+      <div id="tour-info-rows"></div>
+    </div>
+
+    <!-- 타임라인 -->
+    <div class="card" id="timeline-card" style="display:none;">
+      <div class="card-title">⏱️ 오늘 일정</div>
+      <div class="timeline" id="timeline-rows"></div>
+    </div>
+
+    <!-- 예약 확정 체크리스트 -->
+    <div class="card" id="booking-card" style="display:none;">
+      <div class="card-title">✅ 예약 확정</div>
+      <div id="booking-list"></div>
+    </div>
+
+    <!-- 추천루트 A/B -->
+    <div class="card" id="route-card" style="display:none;">
+      <div class="card-title">🗺️ 추천 루트</div>
+      <div class="route-btns" id="route-btns"></div>
+      <div id="route-detail"></div>
+    </div>
+
+    <!-- 식사 확인 -->
+    <div class="card" id="food-card" style="display:none;">
+      <div class="card-title">🍽️ 식사</div>
+      <div id="food-list"></div>
+    </div>
+
+    <!-- 내인룸 (호텔) -->
+    <div class="card" id="hotel-detail-card" style="display:none;">
+      <div class="card-title">🏨 숙박</div>
+      <div id="hotel-detail-rows"></div>
+    </div>
+
+    <!-- 메모 -->
+    <div class="card">
+      <div class="card-title">📝 메모</div>
+      <textarea id="tour-memo" placeholder="행사 메모..." style="width:100%;padding:10px;border:1.5px solid #e0e0e5;border-radius:10px;background:#f7f7f9;font-size:14px;min-height:80px;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+
+    <button class="btn btn-green" onclick="goToReportEntry()">📋 리포트 작성 →</button>
+    <button class="btn btn-grey" onclick="closeTourDetail()">← 목록으로</button>
+  </div>
+</div>
+
+<!-- ③ 리포트 작성 탭 -->
+<div id="screen-report" class="screen">
+  <div id="report-entry" style="display:none;">
+
+    <!-- 쇼핑 실적 -->
+    <div class="card" id="shopping-entry-card" style="display:none;">
+      <div class="card-title">🛍️ 쇼핑 실적</div>
+      <p style="font-size:13px;color:var(--sub);margin-bottom:12px;">견적 쇼핑 <strong id="planned-count">0</strong>회 — 실제 판매액 입력</p>
+      <div id="shopping-inputs"></div>
+      <div class="shop-total-row">
+        <span class="lbl">총 판매액</span>
+        <span class="val" id="shopping-total">$0.00</span>
+      </div>
     </div>
 
     <!-- 종료 시간 -->
-    <div class="field">
-      <label>실제 종료 시간</label>
-      <input type="text" id="end-time" placeholder="종료 버튼을 누르세요" readonly>
+    <div class="card">
+      <div class="card-title">⏱️ 투어 종료</div>
+      <div class="field">
+        <label>실제 종료 시간</label>
+        <input type="time" id="end-time">
+      </div>
+      <button class="btn btn-red" id="end-btn" onclick="captureEndTime()">🔴 투어 종료</button>
+      <div class="field" style="margin-top:8px;">
+        <label>비고 / 특이사항</label>
+        <textarea id="report-notes" placeholder="특이사항, 컴플레인, 기타..."></textarea>
+      </div>
     </div>
 
-    <!-- 비고 -->
-    <div class="field">
-      <label>비고 (선택)</label>
-      <textarea id="notes" placeholder="특이사항을 입력하세요"></textarea>
-    </div>
-
-    <!-- 영수증 사진 -->
-    <div class="field">
-      <label>영수증 사진 첨부 (최대 5장)</label>
-      <input type="file" id="cam-input"  accept="image/*" capture="environment" onchange="Photos.add(this)">
-      <input type="file" id="gal-input"  accept="image/*" multiple            onchange="Photos.add(this)">
+    <!-- 영수증 -->
+    <div class="card">
+      <div class="card-title">📸 영수증</div>
+      <input type="file" id="cam-input" accept="image/*" capture="environment" onchange="addPhoto(this)">
+      <input type="file" id="gal-input" accept="image/*" multiple onchange="addPhoto(this)">
       <div class="photo-btns">
-        <button class="btn-cam" type="button" onclick="document.getElementById('cam-input').click()">📷 카메라</button>
-        <button class="btn-gal" type="button" onclick="document.getElementById('gal-input').click()">🖼️ 갤러리</button>
+        <button onclick="document.getElementById('cam-input').click()">📷 카메라</button>
+        <button onclick="document.getElementById('gal-input').click()">🖼️ 갤러리</button>
       </div>
       <div class="preview-grid" id="preview-grid"></div>
-      <p class="photo-count" id="photo-count"></p>
+      <p style="font-size:12px;color:var(--sub);margin-top:6px;" id="photo-count"></p>
     </div>
 
-    <!-- 진행률 -->
     <div class="progress-wrap" id="progress-wrap">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-fill"></div>
-      </div>
-      <p class="progress-label" id="progress-label">업로드 중...</p>
+      <div class="progress-bg"><div class="progress-fill" id="progress-fill"></div></div>
+      <p class="progress-lbl" id="progress-lbl"></p>
     </div>
 
-    <!-- 버튼 -->
-    <button class="btn-end" id="end-btn" onclick="Report.captureEndTime()">
-      🔴 투어 종료 (Turn off)
-    </button>
-    <button class="btn-submit" id="submit-btn" onclick="Report.submit()">
-      최종 제출
-    </button>
+    <button class="btn btn-grey" onclick="showTab('today')">← 투어로 돌아가기</button>
+    <button class="btn btn-green" id="submit-btn" onclick="submitReport()">✅ 최종 제출</button>
+  </div>
+
+  <div id="report-empty" style="text-align:center;padding:60px 20px;color:var(--sub);">
+    Today 탭에서 투어를 선택하고<br>리포트 작성 버튼을 누르세요.
   </div>
 </div>
 
-<!-- ③ 제출 완료 화면 -->
-<div id="success-screen">
-  <div class="icon">✅</div>
-  <p>리포트 제출 완료!</p>
-  <small id="success-detail"></small>
-  <br>
-  <button class="btn-new" onclick="Report.reset()">새 리포트 작성</button>
+<!-- ④ 실적 탭 -->
+<div id="screen-stats" class="screen">
+
+  <!-- 주간/월간 토글 -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <button class="btn btn-dark" id="stats-week-btn" onclick="loadStats('week')" style="flex:1;padding:10px;">이번 주</button>
+    <button class="btn btn-grey" id="stats-month-btn" onclick="loadStats('month')" style="flex:1;padding:10px;">이번 달</button>
+  </div>
+
+  <!-- 합계 카드 -->
+  <div class="period-card">
+    <div class="p-label" id="period-label">이번 주 실적</div>
+    <div class="p-val" id="period-total">$0</div>
+    <div class="period-grid">
+      <div class="period-item"><div class="pi-lbl">쇼핑</div><div class="pi-val" id="period-shopping">$0</div></div>
+      <div class="period-item"><div class="pi-lbl">가이드피</div><div class="pi-val" id="period-guide">$0</div></div>
+      <div class="period-item"><div class="pi-lbl">투어 수</div><div class="pi-val" id="period-tours">0</div></div>
+      <div class="period-item"><div class="pi-lbl">마진</div><div class="pi-val" id="period-margin">0%</div></div>
+    </div>
+  </div>
+
+  <!-- 일별 리포트 테이블 -->
+  <div class="card">
+    <div class="card-title">📋 일별 내역</div>
+    <div style="overflow-x:auto;">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>투어명</th>
+            <th>쇼핑</th>
+            <th>가이드피</th>
+            <th>마진</th>
+          </tr>
+        </thead>
+        <tbody id="stats-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--sub);padding:20px;">데이터 없음</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ④ GPS 위치 탭 -->
+<div id="screen-gps" class="screen">
+  <div class="card">
+    <div class="card-title">📍 동료 가이드 위치</div>
+    <div id="gps-map">
+      <div class="map-placeholder">
+        <div style="font-size:32px;">🗺️</div>
+        <div>위치 로딩 중...</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn btn-dark" onclick="startGPSTracking()">📡 내 위치 공유 시작</button>
+      <button class="btn btn-grey" onclick="stopGPSTracking()" id="stop-gps-btn" style="display:none;">⏹ 위치 공유 중지</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">👥 가이드 목록</div>
+    <div id="guide-list-gps"><div style="color:var(--sub);text-align:center;padding:20px;">불러오는 중...</div></div>
+  </div>
+</div>
+
+<!-- ⑤ 공지 탭 -->
+<div id="screen-notice" class="screen">
+  <div class="card">
+    <div class="card-title">📣 공지 / 메시지</div>
+    <div id="notice-list"><div style="color:var(--sub);text-align:center;padding:32px;">공지가 없습니다.</div></div>
+  </div>
+</div>
+
+<!-- ⑥ 제출 완료 -->
+<div id="success-screen" style="display:none;">
+  <div class="success-icon">✅</div>
+  <div class="success-title">제출 완료!</div>
+  <div class="success-sub" id="success-detail"></div>
+  <button class="btn btn-dark" style="max-width:300px;margin:0 auto;display:block;" onclick="resetAfterSubmit()">새 리포트</button>
+</div>
+
+<!-- 캡틴 공유 모달 -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <div style="font-size:16px;font-weight:800;margin-bottom:8px;">📤 일정 공유</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:12px;">캡틴에게 이 코드를 알려주세요</div>
+    <div class="share-code" id="share-code">------</div>
+    <div class="share-url" id="share-url"></div>
+    <button class="btn btn-dark" onclick="copyShareLink()">링크 복사</button>
+    <button class="btn btn-grey" onclick="closeShareModal()">닫기</button>
+  </div>
 </div>
 
 <script>
-// =====================================================
-// ⚙️ 설정 — 본인 Supabase 값으로 교체하세요
-// =====================================================
-const SUPABASE_URL  = 'https://oybauzioqabopskxdaea.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB';
-const STORAGE_BUCKET = 'receipts';
-const OFFLINE_KEY    = 'tf_report_draft';
+const SB_URL = 'https://oybauzioqabopskxdaea.supabase.co';
+const SB_KEY = 'sb_publishable_XJxgPrF_34hg4ZhrS3qY3g_1xhq37ZB';
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let selectedTour = null;
+let curUser=null, selTour=null, selQuote=null, photoFiles=[];
 
-// =====================================================
-// 🔐 Auth
-// =====================================================
-const Auth = {
-  async login() {
-    const email = document.getElementById('auth-email').value.trim();
-    const pw    = document.getElementById('auth-pw').value;
-    const msg   = document.getElementById('auth-msg');
-    if (!email || !pw) { msg.innerText = '이메일과 비밀번호를 입력하세요.'; return; }
+/* ══ AUTH ══ */
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const msg=document.getElementById('login-msg');
+  msg.innerText='';
+  if(!email||!pw){msg.innerText='이메일과 비밀번호를 입력하세요.';return;}
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+  if(error){msg.innerText=error.message;return;}
+  curUser=data.user;
+  showApp();
+}
+async function doLogout(){
+  await sb.auth.signOut();
+  curUser=null;selTour=null;selQuote=null;
+  document.getElementById('navbar').style.display='none';
+  document.getElementById('bottom-tab').style.display='none';
+  document.getElementById('login-screen').style.display='block';
+  ['screen-today','screen-report','screen-stats','success-screen'].forEach(function(id){document.getElementById(id).style.display='none';});
+}
+async function initApp(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(user){curUser=user;showApp();}
+}
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('navbar').style.display='flex';
+  document.getElementById('bottom-tab').style.display='flex';
+  document.getElementById('navbar-user').innerText=curUser?.email||'';
+  switchTab('today');
+  buildCalStrip();
+  loadToday();
+  subscribeNotices();
+}
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
-    if (error) { msg.innerText = error.message; return; }
+/* ══ TAB ══ */
+function switchTab(tab){
+  ['today','report','gps','notice','stats'].forEach(function(t){
+    var s=document.getElementById('screen-'+t);
+    if(s) s.style.display='none';
+    var b=document.getElementById('tab-'+t);
+    if(b) b.classList.remove('active');
+  });
+  var sc=document.getElementById('screen-'+tab);
+  if(sc) sc.style.display='block';
+  var tb=document.getElementById('tab-'+tab);
+  if(tb) tb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(tab==='stats') loadStats('week');
+  if(tab==='gps') loadGPS();
+  if(tab==='notice') loadNotices();
+}
+function showTab(tab){switchTab(tab);}
 
-    Auth.showReport(data.user);
-  },
-
-  async logout() {
-    await sb.auth.signOut();
-    document.getElementById('report-screen').style.display = 'none';
-    document.getElementById('auth-screen').style.display   = 'block';
-  },
-
-  showReport(user) {
-    document.getElementById('auth-screen').style.display   = 'none';
-    document.getElementById('report-screen').style.display = 'block';
-    document.getElementById('user-label').innerText =
-      '가이드: ' + (user.email || user.id.slice(0, 8));
-    Draft.load();
-  },
-
-  async init() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (user) {
-      Auth.showReport(user);
-      Today.load();
-    }
+/* ══ CALENDAR STRIP ══ */
+function buildCalStrip(){
+  var strip=document.getElementById('cal-strip');
+  strip.innerHTML='';
+  var today=new Date();
+  for(var i=-3;i<=10;i++){
+    var d=new Date(today);
+    d.setDate(today.getDate()+i);
+    var dow=['일','월','화','수','목','금','토'][d.getDay()];
+    var dateStr=d.toISOString().slice(0,10);
+    var isToday=i===0;
+    var div=document.createElement('div');
+    div.className='cal-day'+(isToday?' today selected':'');
+    div.dataset.date=dateStr;
+    div.innerHTML='<div class="dow">'+dow+'</div><div class="date">'+d.getDate()+'</div><div class="dot" style="opacity:0;"></div>';
+    div.onclick=function(){
+      document.querySelectorAll('.cal-day').forEach(function(el){el.classList.remove('selected');if(!el.classList.contains('today'))el.style.background='';});
+      this.classList.add('selected');
+      loadToursByDate(this.dataset.date);
+    };
+    strip.appendChild(div);
   }
-};
+}
 
-// =====================================================
-// 📸 Photos
-// =====================================================
-const Photos = {
-  _files: [],
-  MAX: 5,
+/* ══ TODAY ══ */
+async function loadToday(){
+  var today=new Date().toISOString().slice(0,10);
+  await loadToursByDate(today);
+}
 
-  add(input) {
-    const newFiles = Array.from(input.files);
-    const remaining = this.MAX - this._files.length;
-    if (remaining <= 0) { alert('최대 5장까지 첨부 가능합니다.'); return; }
-    newFiles.slice(0, remaining).forEach(f => this._files.push(f));
-    input.value = '';
-    this.render();
-    Draft.save();
-  },
+async function loadToursByDate(dateStr){
+  var listEl=document.getElementById('today-list');
+  listEl.innerHTML='<div style="color:var(--sub);text-align:center;padding:32px;">불러오는 중...</div>';
+  document.getElementById('tour-detail').style.display='none';
+  try{
+    var {data,error}=await sb.from('tours').select('*').eq('scheduled_date',dateStr).order('start_time',{ascending:true});
+    if(error) throw error;
+    var tours=data||[];
+    document.getElementById('stat-today').innerText=tours.length;
+    var pax=tours.reduce(function(s,t){return s+(t.pax||0);},0);
+    document.getElementById('stat-pax').innerText=pax||'-';
 
-  remove(idx) {
-    this._files.splice(idx, 1);
-    this.render();
-    Draft.save();
-  },
-
-  render() {
-    const grid  = document.getElementById('preview-grid');
-    const count = document.getElementById('photo-count');
-    grid.innerHTML = '';
-    this._files.forEach((f, i) => {
-      const url  = URL.createObjectURL(f);
-      const item = document.createElement('div');
-      item.className = 'preview-item';
-      item.innerHTML =
-        '<img src="' + url + '" alt="영수증">' +
-        '<button class="rm" onclick="Photos.remove(' + i + ')">✕</button>';
-      grid.appendChild(item);
-    });
-    count.innerText = this._files.length > 0
-      ? this._files.length + '장 선택됨' : '';
-  },
-
-  getFiles() { return this._files; }
-};
-
-// =====================================================
-// 💾 Draft (오프라인 임시저장)
-// =====================================================
-const Draft = {
-  save() {
-    localStorage.setItem(OFFLINE_KEY, JSON.stringify({
-      endTime: document.getElementById('end-time').value,
-      notes:   document.getElementById('notes').value,
-      photoCount: Photos.getFiles().length
-    }));
-  },
-
-  load() {
-    try {
-      const d = JSON.parse(localStorage.getItem(OFFLINE_KEY) || 'null');
-      if (!d) return;
-      if (d.endTime) {
-        document.getElementById('end-time').value = d.endTime;
-        const btn = document.getElementById('end-btn');
-        btn.disabled = true;
-        btn.innerText = '투어 종료 완료';
-      }
-      if (d.notes) document.getElementById('notes').value = d.notes;
-    } catch (e) {}
-  },
-
-  clear() { localStorage.removeItem(OFFLINE_KEY); }
-};
-
-// =====================================================
-// 📤 Report
-// =====================================================
-const Report = {
-  captureEndTime() {
-    const now = new Date();
-    const t   = now.toLocaleTimeString('ko-KR', {
-      hour: '2-digit', minute: '2-digit', hour12: false
-    });
-    document.getElementById('end-time').value = t;
-    const btn = document.getElementById('end-btn');
-    btn.disabled  = true;
-    btn.innerText = '투어 종료 완료';
-    Draft.save();
-  },
-
-  async submit() {
-    const submitBtn = document.getElementById('submit-btn');
-    const endTime   = document.getElementById('end-time').value;
-    const notes     = document.getElementById('notes').value.trim();
-    const files     = Photos.getFiles();
-
-    // 검증
-    if (!endTime) {
-      alert('종료 시간을 먼저 기록해주세요.');
+    if(!tours.length){
+      listEl.innerHTML='<div style="color:var(--sub);text-align:center;padding:32px;font-size:14px;">이 날 투어가 없습니다.</div>';
       return;
     }
+    listEl.innerHTML='';
+    tours.forEach(function(t){
+      var div=document.createElement('div');
+      div.className='tour-card';
+      var dest=t.destination||t.tour_type||'';
+      div.innerHTML=
+        '<div class="tour-card-name">'+(t.tour_name||t.guest_name||'투어')+'</div>'+
+        '<div class="tour-card-meta">'+
+          '<span>👥 '+(t.pax||'?')+'명</span>'+
+          (t.start_time?'<span>🕐 '+t.start_time+'</span>':'')+
+          (dest?'<span>📍 '+dest+'</span>':'')+
+        '</div>'+
+        '<div style="margin-top:6px;">'+
+          '<span class="badge badge-blue">'+(t.status||'Confirmed')+'</span>'+
+        '</div>';
+      div.onclick=function(){selectTour(t,div);};
+      listEl.appendChild(div);
+    });
+  }catch(e){
+    listEl.innerHTML='<div style="color:var(--red);text-align:center;padding:32px;">로드 실패: '+e.message+'</div>';
+  }
+}
 
-    // 오프라인 차단
-    if (!navigator.onLine) {
-      alert('오프라인 상태입니다. 인터넷 연결 후 다시 시도하세요.');
+/* ══ TOUR DETAIL ══ */
+async function selectTour(tour,el){
+  document.querySelectorAll('.tour-card').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected');
+  selTour=tour;
+
+  // 견적 로드
+  if(tour.quote_id){
+    var {data}=await sb.from('quotes').select('*').eq('id',tour.quote_id).single();
+    selQuote=data||null;
+  } else {
+    selQuote=null;
+  }
+
+  renderTourDetail();
+  document.getElementById('today-list').style.display='none';
+  document.getElementById('tour-detail').style.display='block';
+}
+
+function closeTourDetail(){
+  document.getElementById('tour-detail').style.display='none';
+  document.getElementById('today-list').style.display='block';
+  selTour=null; selQuote=null;
+}
+
+function renderTourDetail(){
+  var t=selTour, q=selQuote;
+
+  // 기본 정보 (재무 정보 제외)
+  var rows=[
+    {lbl:'투어명', val:t.tour_name||q?.tour_name||'-'},
+    {lbl:'날짜',   val:t.scheduled_date||q?.start_date||'-'},
+    {lbl:'인원',   val:(t.pax||q?.pax||'-')+'명'},
+    {lbl:'에이전시', val:t.guest_name||q?.agency||'-'},
+    {lbl:'투어코드', val:t.tour_code||t.id?.slice(0,8)||'-'},
+    {lbl:'플라이트', val:t.flight_code||(q?.notes||'-')},
+    {lbl:'도착시간', val:t.arrival_time||'-'},
+  ];
+  document.getElementById('tour-info-rows').innerHTML=rows.map(function(r){
+    return '<div class="info-row"><span class="lbl">'+r.lbl+'</span><span class="val">'+r.val+'</span></div>';
+  }).join('');
+
+  // 캡틴 카드
+  if(t.captain_name||t.captain_contact){
+    document.getElementById('captain-card').style.display='block';
+    document.getElementById('captain-name').innerText=t.captain_name||'캡틴';
+    document.getElementById('captain-num').innerText=t.captain_contact||'-';
+    document.getElementById('captain-call-btn').onclick=function(){
+      window.location.href='tel:'+t.captain_contact;
+    };
+  }
+
+  // 타임라인 생성 (운송 + 관광지 + 식사 합쳐서 시간순)
+  var events=[];
+  // 공항 미팅
+  if(t.arrival_time) events.push({time:t.arrival_time, name:'✈️ 공항 미팅', meta:'Flight '+( t.flight_code||''), type:'airport'});
+  // 관광지
+  var attrs=q?.attraction_items||[];
+  attrs.forEach(function(a){ if(a.date||a.time) events.push({time:a.time||a.date||'', name:'🎫 '+( a.attraction||''), meta:'성인 '+(a.adult_pax||0)+'명', type:'attraction'}); });
+  // 식사
+  var meals=q?.meal_items||[];
+  meals.forEach(function(m){ events.push({time:'', name:'🍽️ '+(m.restaurant||'식사'), meta:(m.meal_type||'')+' · '+(m.pax||'')+'명', type:'meal'}); });
+  // 운송
+  var trans=q?.transport_items||[];
+  trans.forEach(function(tr){ if(tr.date) events.push({time:tr.date||'', name:'🚌 '+(tr.company||'차량'), meta:tr.dest||'', type:'transport'}); });
+
+  if(events.length){
+    document.getElementById('timeline-card').style.display='block';
+    document.getElementById('timeline-rows').innerHTML=events.map(function(ev,i){
+      return '<div class="tl-item">'+
+        '<div class="tl-dot'+(i===0?' current':'')+'"></div>'+
+        (ev.time?'<div class="tl-time">'+ev.time+'</div>':'')+
+        '<div class="tl-name">'+ev.name+'</div>'+
+        (ev.meta?'<div class="tl-meta">'+ev.meta+'</div>':'')+
+      '</div>';
+    }).join('');
+  }
+
+  // 예약 확정 체크리스트
+  var bookings=[];
+  attrs.forEach(function(a){bookings.push({name:a.attraction,time:a.time||a.date||''});});
+  if(t.scenic_confirmed!==undefined) bookings.push({name:'Scenic World',confirmed:t.scenic_confirmed});
+  if(t.everton_confirmed!==undefined) bookings.push({name:'Everton (Dolphin)',confirmed:t.everton_confirmed});
+  if(bookings.length){
+    document.getElementById('booking-card').style.display='block';
+    document.getElementById('booking-list').innerHTML=bookings.map(function(b){
+      return '<div class="checklist-item">'+
+        '<div><div class="name">'+b.name+'</div>'+(b.time?'<div class="time">'+b.time+'</div>':'')+
+        '</div><button class="check-btn'+(b.confirmed?' checked':'')+'" onclick="toggleCheck(this)">✓</button></div>';
+    }).join('');
+  }
+
+  // 추천루트 A/B
+  var routes=q?.route_options||t.route_options;
+  if(routes){
+    document.getElementById('route-card').style.display='block';
+    try{
+      var ro=typeof routes==='string'?JSON.parse(routes):routes;
+      document.getElementById('route-btns').innerHTML=Object.keys(ro).map(function(k){
+        return '<button class="route-btn" onclick="selectRoute(this,\''+k+'\')">'+'루트 '+k+'</button>';
+      }).join('');
+    }catch(e){}
+  }
+
+  // 식사
+  if(meals.length){
+    document.getElementById('food-card').style.display='block';
+    document.getElementById('food-list').innerHTML=meals.map(function(m){
+      return '<div class="checklist-item">'+
+        '<div><div class="name">'+(m.restaurant||'-')+'</div><div class="time">'+(m.meal_type||'')+' · '+(m.pax||'?')+'명</div></div>'+
+        '<button class="check-btn" onclick="toggleCheck(this)">✓</button></div>';
+    }).join('');
+  }
+
+  // 숙박
+  var hotels=q?.hotel_items||[];
+  if(hotels.length){
+    document.getElementById('hotel-detail-card').style.display='block';
+    document.getElementById('hotel-detail-rows').innerHTML=hotels.map(function(h){
+      return '<div class="info-row"><span class="lbl">'+(h.hotel_name||'호텔')+'</span><span class="val">'+(h.check_in_date||'')+' ~ '+(h.check_out_date||'')+'</span></div>';
+    }).join('');
+  }
+}
+
+function toggleCheck(btn){
+  btn.classList.toggle('checked');
+}
+
+function selectRoute(btn,key){
+  document.querySelectorAll('.route-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+}
+
+/* ══ 캡틴 SMS ══ */
+function sendCaptainSMS(type){
+  if(!selTour?.captain_contact){alert('캡틴 연락처가 없습니다.');return;}
+  var msg=type==='ready'
+    ? '준비 완료했습니다. 곧 출발할 예정입니다.'
+    : '손님 미팅 완료했습니다. 15분 후 출구로 와주세요.';
+  window.location.href='sms:'+selTour.captain_contact+'?body='+encodeURIComponent(msg);
+}
+function callCaptain(){
+  if(!selTour?.captain_contact){alert('캡틴 연락처가 없습니다.');return;}
+  window.location.href='tel:'+selTour.captain_contact;
+}
+
+/* ══ 캡틴 일정 공유 ══ */
+function shareTourWithCaptain(){
+  if(!selTour){return;}
+  var code=(selTour.tour_code||selTour.id.slice(0,6)).toUpperCase();
+  var url=window.location.origin+window.location.pathname+'?captain='+code;
+  document.getElementById('share-code').innerText=code;
+  document.getElementById('share-url').innerText=url;
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShareModal(){
+  document.getElementById('share-modal').classList.remove('show');
+}
+function copyShareLink(){
+  var url=document.getElementById('share-url').innerText;
+  navigator.clipboard.writeText(url).then(function(){
+    alert('링크가 복사됐습니다.');
+  }).catch(function(){
+    alert(url);
+  });
+}
+
+/* ══ GPS 추적 ══ */
+var gpsInterval=null;
+var gpsWatchId=null;
+
+async function loadGPS(){
+  var listEl=document.getElementById('guide-list-gps');
+  try{
+    var {data}=await sb.from('guide_locations').select('*').order('updated_at',{ascending:false});
+    var guides=data||[];
+    if(!guides.length){
+      listEl.innerHTML='<div style="color:var(--sub);text-align:center;padding:20px;">위치 공유 중인 가이드 없음</div>';
+      renderSimpleMap(guides);
       return;
     }
-
-    submitBtn.disabled  = true;
-    submitBtn.innerText = '제출 중...';
-
-    // 진행률 바 표시
-    const progressWrap  = document.getElementById('progress-wrap');
-    const progressFill  = document.getElementById('progress-fill');
-    const progressLabel = document.getElementById('progress-label');
-    progressWrap.style.display = 'block';
-
-    try {
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) throw new Error('로그인이 필요합니다.');
-
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-      const { data: profileData, error: profileErr } = await sb
-        .from('profiles')
-        .select('company_id')
-        .eq('id', user.id)
-        .single();
-      const companyId = profileData?.company_id || null;
-
-      const tour = selectedTour || null;
-      const tourId = tour?.id || null;
-      const guideFee = tour?.guide_fee ?? tour?.guide_cost ?? 0;
-      const shoppingSales = tour?.shopping_sales ?? ((tour?.health_sales || 0) + (tour?.general_sales || 0) + (tour?.wool_sales || 0));
-      const totalRevenue = tour?.total_revenue ?? tour?.tour_fee ?? 0;
-
-      // ── 1. 이미지 순차 업로드 ──────────────────────
-      const receiptUrls = [];
-      for (let i = 0; i < files.length; i++) {
-        const pct   = Math.round(((i) / (files.length || 1)) * 80);
-        progressFill.style.width  = pct + '%';
-        progressLabel.innerText   = '이미지 업로드 중 (' + (i + 1) + '/' + files.length + ')...';
-
-        const ext  = files[i].name.split('.').pop();
-        const path = user.id + '/' + Date.now() + '_' + i + '.' + ext;
-
-        const { error: upErr } = await sb.storage
-          .from(STORAGE_BUCKET)
-          .upload(path, files[i], { upsert: false });
-
-        if (upErr) throw new Error('이미지 업로드 실패: ' + upErr.message);
-
-        const { data: urlData } = sb.storage
-          .from(STORAGE_BUCKET)
-          .getPublicUrl(path);
-
-        receiptUrls.push(urlData.publicUrl);
-      }
-
-      // ── 2. DB INSERT ────────────────────────────────
-      progressFill.style.width  = '90%';
-      progressLabel.innerText   = '데이터 저장 중...';
-
-      const { data: dailyData, error: dailyErr } = await sb
-        .from('daily_records')
-        .insert({
-          guide_id:      user.id,
-          company_id:    companyId,
-          tour_id:       tourId,
-          record_date:   todayStr,
-          start_time:    tour?.start_time || null,
-          end_time:      endTime,
-          guide_fee:     guideFee,
-          shopping_sales: shoppingSales,
-          total_revenue: totalRevenue,
-          notes:         notes || null
-        })
-        .select()
-        .single();
-
-      if (dailyErr) throw new Error('Daily 기록 저장 실패: ' + dailyErr.message);
-
-      const reportPayload = {
-        guide_id:        user.id,
-        company_id:      companyId,
-        tour_id:         tourId,
-        daily_record_id: dailyData?.id || null,
-        report_date:     todayStr,
-        actual_end_time: endTime,
-        receipt_urls:    receiptUrls,
-        notes:           notes || null,
-        amount:          guideFee + shoppingSales
-      };
-
-      const { data: reportData, error: dbErr } = await sb
-        .from('reports')
-        .insert(reportPayload)
-        .select()
-        .single();
-
-      if (dbErr) {
-        if (/column .* does not exist/i.test(dbErr.message)) {
-          const { error: fallbackErr } = await sb
-            .from('reports')
-            .insert({
-              guide_id:        user.id,
-              company_id:      companyId,
-              actual_end_time: endTime,
-              receipt_urls:    receiptUrls,
-              notes:           notes || null
-            });
-          if (fallbackErr) throw fallbackErr;
-        } else {
-          throw new Error('DB 저장 실패: ' + dbErr.message);
-        }
-      }
-
-      await sendReportEmail(reportData?.id || null, {
-        tour_id: tourId,
-        company_id: companyId,
-        guide_id: user.id,
-        end_time: endTime
-      });
-
-      // ── 3. 완료 ─────────────────────────────────────
-      progressFill.style.width  = '100%';
-      progressLabel.innerText   = '완료!';
-
-      Draft.clear();
-
-      const now = new Date();
-      document.getElementById('success-detail').innerText =
-        '종료 시간: ' + endTime +
-        '  |  영수증 ' + receiptUrls.length + '장' +
-        '  |  ' + now.toLocaleDateString('ko-KR');
-
-      setTimeout(() => {
-        document.getElementById('report-screen').style.display  = 'none';
-        document.getElementById('success-screen').style.display = 'block';
-      }, 600);
-
-    } catch (err) {
-      console.error('제출 실패:', err);
-      alert('전송 실패: ' + err.message + '\n관리자에게 문의하세요.');
-      submitBtn.disabled  = false;
-      submitBtn.innerText = '최종 제출';
-      progressWrap.style.display = 'none';
-    }
-  },
-
-  reset() {
-    document.getElementById('end-time').value = '';
-    document.getElementById('notes').value    = '';
-    document.getElementById('end-btn').disabled  = false;
-    document.getElementById('end-btn').innerText = '🔴 투어 종료 (Turn off)';
-    document.getElementById('submit-btn').disabled  = false;
-    document.getElementById('submit-btn').innerText = '최종 제출';
-    document.getElementById('progress-wrap').style.display = 'none';
-    document.getElementById('preview-grid').innerHTML = '';
-    document.getElementById('photo-count').innerText  = '';
-    Photos._files = [];
-    document.getElementById('success-screen').style.display = 'none';
-    document.getElementById('report-screen').style.display  = 'block';
+    listEl.innerHTML=guides.map(function(g){
+      var mins=Math.round((Date.now()-new Date(g.updated_at))/60000);
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f7f7f9;border-radius:10px;margin-bottom:6px;">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:700;">'+(g.guide_name||'가이드')+'</div>'+
+          '<div style="font-size:12px;color:var(--sub);">'+(g.tour_name||'')+'</div>'+
+        '</div>'+
+        '<div style="font-size:12px;color:var(--sub);">'+mins+'분 전</div>'+
+      '</div>';
+    }).join('');
+    renderSimpleMap(guides);
+  }catch(e){
+    listEl.innerHTML='<div style="color:var(--red);text-align:center;padding:20px;">로드 실패</div>';
   }
-};
+}
 
-async function sendReportEmail(reportId, payload) {
-  try {
-    if (!reportId) return;
-    await sb.functions.invoke('send_report_email', {
-      body: {
-        report_id: reportId,
-        ...payload
-      }
+function renderSimpleMap(guides){
+  var mapEl=document.getElementById('gps-map');
+  if(!guides.length){
+    mapEl.innerHTML='<div class="map-placeholder"><div style="font-size:32px;">🗺️</div><div>위치 공유 중인 가이드 없음</div></div>';
+    return;
+  }
+  // Leaflet 지도 (CDN에서 로드)
+  if(!window.L){
+    var link=document.createElement('link');
+    link.rel='stylesheet'; link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    var script=document.createElement('script');
+    script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload=function(){ initLeafletMap(guides); };
+    document.head.appendChild(script);
+  } else {
+    initLeafletMap(guides);
+  }
+}
+
+var leafletMap=null;
+function initLeafletMap(guides){
+  if(!window.L) return;
+  var mapEl=document.getElementById('gps-map');
+  mapEl.innerHTML='';
+  if(leafletMap){leafletMap.remove();leafletMap=null;}
+  var center=guides.length?[guides[0].latitude,guides[0].longitude]:[-33.8688,151.2093];
+  leafletMap=L.map('gps-map').setView(center,12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap'
+  }).addTo(leafletMap);
+  guides.forEach(function(g){
+    if(!g.latitude||!g.longitude) return;
+    var icon=L.divIcon({
+      html:'<div style="background:#007aff;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.3);">👤</div>',
+      className:'',iconSize:[32,32],iconAnchor:[16,16]
     });
-    console.log('Requested report email notification for', reportId);
-  } catch (err) {
-    console.warn('Report email notification failed', err);
-  }
+    L.marker([g.latitude,g.longitude],{icon:icon})
+      .addTo(leafletMap)
+      .bindPopup('<b>'+(g.guide_name||'가이드')+'</b><br>'+(g.tour_name||''));
+  });
 }
 
-// =====================================================
-// 🌐 오프라인 감지
-// =====================================================
-window.addEventListener('offline', () => {
-  document.getElementById('offline-banner').style.display = 'block';
-  Draft.save();
-});
-window.addEventListener('online', () => {
-  document.getElementById('offline-banner').style.display = 'none';
-});
-
-// =====================================================
-// Today data binding (Supabase)
-// =====================================================
-const Today = {
-  async init() {
-    await this.load();
-    setInterval(() => this.load(), 60_000);
-  },
-
-  async load() {
-    const listEl = document.querySelector('.today-list');
-    if (!listEl) return;
-    listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">불러오는 중...</div>';
-
-    try {
-      const today = new Date();
-      const y = today.getFullYear();
-      const m = String(today.getMonth() + 1).padStart(2, '0');
-      const d = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${y}-${m}-${d}`; // expecting a YYYY-MM-DD field value
-
-      const { data: authData, error: authErr } = await sb.auth.getUser();
-      if (authErr || !authData.user) {
-        listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">로그인 후 확인하세요.</div>';
-        return;
-      }
-      const user = authData.user;
-
-      const { data: profileData } = await sb
-        .from('profiles')
-        .select('company_id')
-        .eq('id', user.id)
-        .single();
-      const companyId = profileData?.company_id || null;
-
-      // 1) fetch today's tours for this guide or company
-      let q = sb.from('tours').select('*').eq('scheduled_date', todayStr);
-      if (companyId) {
-        q = q.eq('company_id', companyId);
-      } else if (user.id) {
-        q = q.eq('assigned_guide', user.id);
-      }
-      q = q.order('start_time', { ascending: true });
-
-      let { data, error } = await q;
-      Today.tours = data || [];
-      if (data && data.length === 1) {
-        selectedTour = data[0];
-        document.getElementById('selected-tour-label').innerText = selectedTour.tour_name || selectedTour.guest_name || '오늘 일정';
-      }
-
-      if (error) {
-        console.warn('Today: primary query failed', error);
-        data = [];
-      }
-
-      // render
-      listEl.innerHTML = '';
-      if (!data || data.length === 0) {
-        listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">오늘 일정이 없습니다.</div>';
-      } else {
-        data.forEach(item => {
-          const li = document.createElement('div');
-          li.className = 'list-item' + (selectedTour && selectedTour.id === item.id ? ' selected' : '');
-          li.dataset.tourId = item.id;
-          li.onclick = () => Today.selectTour(item, li);
-
-          const left = document.createElement('div'); left.className = 'item-left';
-          left.innerText = item.guest_name || item.leader || '이름 없음';
-
-          const mid = document.createElement('div'); mid.className = 'item-middle';
-          mid.innerText = ((item.tour_type) ? item.tour_type + ' · ' : '') + (item.start_time || '시간 없음');
-
-          const right = document.createElement('div'); right.className = 'item-right';
-          const box1 = document.createElement('div'); box1.className = 'box';
-          const box2 = document.createElement('div'); box2.className = 'box';
-          right.appendChild(box1); right.appendChild(box2);
-
-          li.appendChild(left); li.appendChild(mid); li.appendChild(right);
-          listEl.appendChild(li);
-        });
-      }
-
-      // update header stats: week total, tours today, issues count
-      try {
-        const weekStart = (() => {
-          const d0 = new Date();
-          const day = d0.getDay();
-          const diff = d0.getDate() - day + (day === 0 ? -6 : 1); // Monday
-          const m0 = new Date(d0.setDate(diff));
-          return `${m0.getFullYear()}-${String(m0.getMonth()+1).padStart(2,'0')}-${String(m0.getDate()).padStart(2,'0')}`;
-        })();
-        const weekEnd = (() => {
-          const s = new Date();
-          const day = s.getDay();
-          const diff = s.getDate() - day + (day === 0 ? 0 : 7);
-          const e0 = new Date(s.setDate(diff));
-          return `${e0.getFullYear()}-${String(e0.getMonth()+1).padStart(2,'0')}-${String(e0.getDate()).padStart(2,'0')}`;
-        })();
-
-        const weekRes = await sb
-          .from('tours')
-          .select('id', { count: 'exact', head: false })
-          .gte('scheduled_date', weekStart)
-          .lte('scheduled_date', weekEnd);
-
-        const weekCount = (weekRes && weekRes.count) ? weekRes.count : '-';
-        const toursCount = data ? data.length : 0;
-        const issuesCount = data ? data.filter(i => i.status && /issue|problem|pending/i.test(i.status)).length : 0;
-
-        const statNums = document.querySelectorAll('.today-card .stat-num');
-        if (statNums && statNums.length >= 3) {
-          statNums[0].innerText = weekCount;
-          statNums[1].innerText = toursCount;
-          statNums[2].innerText = issuesCount;
-        }
-      } catch (e) { console.warn('Today: failed to update stats', e); }
-
-    } catch (err) {
-      console.error('Today load failed', err);
-      const listEl = document.querySelector('.today-list');
-      if (listEl) listEl.innerHTML = '<div style="color:#6a6a70;padding:8px">데이터 로드 실패</div>';
+async function startGPSTracking(){
+  if(!navigator.geolocation){alert('GPS를 지원하지 않는 브라우저입니다.');return;}
+  document.getElementById('stop-gps-btn').style.display='block';
+  gpsWatchId=navigator.geolocation.watchPosition(async function(pos){
+    var {data:{user}}=await sb.auth.getUser();
+    if(!user) return;
+    var payload={
+      guide_id:user.id,
+      guide_name:user.email,
+      tour_name:selTour?.tour_name||null,
+      latitude:pos.coords.latitude,
+      longitude:pos.coords.longitude,
+      updated_at:new Date().toISOString()
+    };
+    var existing=await sb.from('guide_locations').select('id').eq('guide_id',user.id).maybeSingle();
+    if(existing.data){
+      await sb.from('guide_locations').update(payload).eq('guide_id',user.id);
+    } else {
+      await sb.from('guide_locations').insert(payload);
     }
-  },
+    loadGPS();
+  },{enableHighAccuracy:true,maximumAge:30000,timeout:10000});
+}
 
-  selectTour(item, listItem) {
-    selectedTour = item;
-    document.querySelectorAll('.today-list .list-item').forEach(el => el.classList.remove('selected'));
-    if (listItem) listItem.classList.add('selected');
-    document.getElementById('selected-tour-label').innerText = item.tour_name || item.guest_name || '오늘 일정';
+function stopGPSTracking(){
+  if(gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+  document.getElementById('stop-gps-btn').style.display='none';
+}
+
+/* ══ 공지 ══ */
+async function loadNotices(){
+  var listEl=document.getElementById('notice-list');
+  try{
+    var {data}=await sb.from('messages')
+      .select('*')
+      .or('recipient_id.is.null,recipient_id.eq.'+curUser.id)
+      .order('created_at',{ascending:false})
+      .limit(50);
+    var msgs=data||[];
+    var unread=msgs.filter(function(m){return !m.is_read;}).length;
+    var badge=document.getElementById('notice-badge');
+    if(unread>0){badge.style.display='inline';badge.innerText=unread;}
+    else{badge.style.display='none';}
+
+    if(!msgs.length){
+      listEl.innerHTML='<div style="color:var(--sub);text-align:center;padding:32px;">공지가 없습니다.</div>';
+      return;
+    }
+    listEl.innerHTML=msgs.map(function(m){
+      var t=new Date(m.created_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      return '<div class="msg-item '+(m.is_read?'read':'unread')+'" onclick="markRead(\''+m.id+'\',this)">'+
+        '<div class="msg-header">'+
+          '<span class="msg-sender">📣 관리자</span>'+
+          '<span class="msg-time">'+t+'</span>'+
+        '</div>'+
+        '<div class="msg-body">'+m.message+'</div>'+
+        (!m.is_read?'<div style="font-size:11px;color:var(--blue);margin-top:4px;font-weight:700;">● 새 메시지</div>':'')+
+      '</div>';
+    }).join('');
+
+    // 읽음 처리
+    var unreadIds=msgs.filter(function(m){return !m.is_read&&(m.recipient_id===curUser.id||!m.recipient_id);}).map(function(m){return m.id;});
+    if(unreadIds.length){
+      await sb.from('messages').update({is_read:true}).in('id',unreadIds);
+    }
+  }catch(e){
+    listEl.innerHTML='<div style="color:var(--red);text-align:center;padding:20px;">로드 실패: '+e.message+'</div>';
   }
-};
-
-// =====================================================
-// Landing handlers + initialization
-// =====================================================
-function goToGuide() {
-  document.getElementById('landing-screen').style.display = 'none';
-  document.getElementById('auth-screen').style.display = 'block';
-  document.getElementById('report-screen').style.display = 'none';
-  document.getElementById('success-screen').style.display = 'none';
 }
 
-function goToQuote() {
-  window.location.href = 'tourflow.html';
+async function markRead(id,el){
+  el.classList.remove('unread');
+  el.classList.add('read');
+  await sb.from('messages').update({is_read:true}).eq('id',id);
 }
 
-function showLanding() {
-  document.getElementById('landing-screen').style.display = 'block';
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('report-screen').style.display = 'none';
-  document.getElementById('success-screen').style.display = 'none';
+/* ══ 실시간 공지 수신 ══ */
+function subscribeNotices(){
+  sb.channel('messages').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(payload){
+    var m=payload.new;
+    if(!m.recipient_id||m.recipient_id===curUser.id){
+      var badge=document.getElementById('notice-badge');
+      badge.style.display='inline';
+      badge.innerText=parseInt(badge.innerText||0)+1;
+    }
+  }).subscribe();
 }
 
-// initialize
-showLanding();
-Today.init();
-Auth.init();
+
+
+/* ══ 리포트 작성 화면 ══ */
+function goToReportEntry(){
+  if(!selTour){alert('투어를 선택하세요.');return;}
+  renderReportEntry();
+  switchTab('report');
+  document.getElementById('report-entry').style.display='block';
+  document.getElementById('report-empty').style.display='none';
+}
+
+function renderReportEntry(){
+  var q=selQuote;
+  var shopItems=q?.shopping_items||[];
+  var shoppingCount=q?.shopping_count||0;
+
+  if(shoppingCount>0||shopItems.length>0){
+    document.getElementById('shopping-entry-card').style.display='block';
+    document.getElementById('planned-count').innerText=shoppingCount||shopItems.length;
+    var html='';
+    var types=shopItems.length?shopItems:[{type:'건강식품'},{type:'잡화'},{type:'울'}];
+    types.forEach(function(s,i){
+      html+=
+        '<div class="shop-row">'+
+          '<div class="shop-row-header">'+
+            '<span class="shop-type">'+s.type+'</span>'+
+            (s.amount?'<span class="shop-planned">견적 $'+Number(s.amount).toFixed(2)+'</span>':'')+
+          '</div>'+
+          '<div class="shop-input-wrap">'+
+            '<span>실제 판매액 $</span>'+
+            '<input type="number" class="shop-input" id="s_'+i+'" placeholder="0" inputmode="decimal" oninput="calcShopTotal()">'+
+          '</div>'+
+        '</div>';
+    });
+    document.getElementById('shopping-inputs').innerHTML=html;
+  }
+}
+
+function calcShopTotal(){
+  var inputs=document.querySelectorAll('.shop-input');
+  var total=0;
+  inputs.forEach(function(i){total+=parseFloat(i.value)||0;});
+  document.getElementById('shopping-total').innerText='$'+total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function captureEndTime(){
+  var now=new Date();
+  var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('end-time').value=t;
+  var btn=document.getElementById('end-btn');
+  btn.disabled=true; btn.innerText='✅ 종료 완료'; btn.style.background=var_green();
+}
+function var_green(){return '#34c759';}
+
+/* ══ PHOTOS ══ */
+function addPhoto(input){
+  var files=Array.from(input.files);
+  var rem=5-photoFiles.length;
+  if(rem<=0){alert('최대 5장');return;}
+  files.slice(0,rem).forEach(function(f){photoFiles.push(f);});
+  input.value=''; renderPhotos();
+}
+function removePhoto(i){photoFiles.splice(i,1);renderPhotos();}
+function renderPhotos(){
+  var grid=document.getElementById('preview-grid');
+  grid.innerHTML='';
+  photoFiles.forEach(function(f,i){
+    var url=URL.createObjectURL(f);
+    var div=document.createElement('div'); div.className='preview-item';
+    div.innerHTML='<img src="'+url+'"><button class="rm" onclick="removePhoto('+i+')">✕</button>';
+    grid.appendChild(div);
+  });
+  document.getElementById('photo-count').innerText=photoFiles.length?photoFiles.length+'장':'';
+}
+
+/* ══ SUBMIT ══ */
+async function submitReport(){
+  var endTime=document.getElementById('end-time').value;
+  var notes=document.getElementById('report-notes').value.trim();
+  if(!endTime){alert('종료 시간을 먼저 기록하세요.');return;}
+  if(!navigator.onLine){alert('오프라인 상태입니다.');return;}
+
+  var submitBtn=document.getElementById('submit-btn');
+  submitBtn.disabled=true; submitBtn.innerText='제출 중...';
+  var pw=document.getElementById('progress-wrap');
+  var pf=document.getElementById('progress-fill');
+  var pl=document.getElementById('progress-lbl');
+  pw.style.display='block';
+
+  try{
+    // 쇼핑 수집
+    var shopInputs=document.querySelectorAll('.shop-input');
+    var totalSales=0;
+    var healthSales=0,generalSales=0,woolSales=0;
+    var shopItems=selQuote?.shopping_items||[{type:'건강식품'},{type:'잡화'},{type:'울'}];
+    shopInputs.forEach(function(inp,i){
+      var amt=parseFloat(inp.value)||0;
+      totalSales+=amt;
+      var type=shopItems[i]?.type||'';
+      if(type==='건강식품') healthSales=amt;
+      else if(type==='잡화') generalSales=amt;
+      else if(type==='울') woolSales=amt;
+    });
+
+    // 이미지 업로드
+    var receiptUrls=[];
+    for(var i=0;i<photoFiles.length;i++){
+      pf.style.width=Math.round(i/photoFiles.length*80)+'%';
+      pl.innerText='이미지 '+(i+1)+'/'+photoFiles.length+' 업로드 중...';
+      var ext=photoFiles[i].name.split('.').pop();
+      var path=curUser.id+'/'+Date.now()+'_'+i+'.'+ext;
+      var {error:upErr}=await sb.storage.from('receipts').upload(path,photoFiles[i],{upsert:false});
+      if(!upErr){
+        var {data:ud}=sb.storage.from('receipts').getPublicUrl(path);
+        receiptUrls.push(ud.publicUrl);
+      }
+    }
+
+    pf.style.width='90%'; pl.innerText='저장 중...';
+
+    var today=new Date().toISOString().slice(0,10);
+    var {error:dbErr}=await sb.from('reports').insert({
+      guide_id:        curUser.id,
+      tour_id:         selTour?.id||null,
+      report_date:     today,
+      actual_end_time: endTime,
+      shopping_sales:  totalSales,
+      health_sales:    healthSales,
+      general_sales:   generalSales,
+      wool_sales:      woolSales,
+      guide_fee:       selTour?.guide_fee||selQuote?.guide_cost||0,
+      receipt_urls:    receiptUrls,
+      notes:           notes||null,
+      tour_name:       selTour?.tour_name||selQuote?.tour_name||null
+    });
+    if(dbErr) throw new Error(dbErr.message);
+
+    pf.style.width='100%'; pl.innerText='완료!';
+    document.getElementById('success-detail').innerText=
+      '종료: '+endTime+' · 쇼핑 $'+totalSales.toFixed(2)+' · 영수증 '+receiptUrls.length+'장';
+
+    setTimeout(function(){
+      document.getElementById('screen-report').style.display='none';
+      document.getElementById('success-screen').style.display='block';
+      document.getElementById('bottom-tab').style.display='none';
+    },600);
+
+  }catch(e){
+    alert('제출 실패: '+e.message);
+    submitBtn.disabled=false; submitBtn.innerText='✅ 최종 제출';
+    pw.style.display='none';
+  }
+}
+
+function resetAfterSubmit(){
+  selTour=null; selQuote=null; photoFiles=[];
+  document.getElementById('end-time').value='';
+  document.getElementById('report-notes').value='';
+  var eb=document.getElementById('end-btn');
+  eb.disabled=false; eb.innerText='🔴 투어 종료'; eb.style.background='';
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('submit-btn').innerText='✅ 최종 제출';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('preview-grid').innerHTML='';
+  document.getElementById('photo-count').innerText='';
+  document.getElementById('shopping-entry-card').style.display='none';
+  document.getElementById('report-entry').style.display='none';
+  document.getElementById('report-empty').style.display='block';
+  document.getElementById('success-screen').style.display='none';
+  document.getElementById('bottom-tab').style.display='flex';
+  switchTab('today');
+  loadToday();
+}
+
+/* ══ STATS ══ */
+var curStatMode='week';
+async function loadStats(mode){
+  curStatMode=mode;
+  document.getElementById('stats-week-btn').className='btn '+(mode==='week'?'btn-dark':'btn-grey');
+  document.getElementById('stats-month-btn').className='btn '+(mode==='month'?'btn-dark':'btn-grey');
+  document.getElementById('stats-week-btn').style.flex='1';
+  document.getElementById('stats-week-btn').style.padding='10px';
+  document.getElementById('stats-month-btn').style.flex='1';
+  document.getElementById('stats-month-btn').style.padding='10px';
+
+  var now=new Date();
+  var startDate,endDate;
+  if(mode==='week'){
+    var day=now.getDay();
+    var diff=now.getDate()-day+(day===0?-6:1);
+    startDate=new Date(now.setDate(diff)).toISOString().slice(0,10);
+    var e=new Date(); e.setDate(e.getDate()+(7-e.getDay()));
+    endDate=e.toISOString().slice(0,10);
+    document.getElementById('period-label').innerText='이번 주 실적';
+  } else {
+    startDate=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+    var lastDay=new Date(now.getFullYear(),now.getMonth()+1,0);
+    endDate=lastDay.toISOString().slice(0,10);
+    document.getElementById('period-label').innerText='이번 달 실적';
+  }
+
+  try{
+    var {data}=await sb.from('reports').select('*')
+      .eq('guide_id',curUser.id)
+      .gte('report_date',startDate)
+      .lte('report_date',endDate)
+      .order('report_date',{ascending:false});
+    var reports=data||[];
+
+    var totalSales=reports.reduce(function(s,r){return s+(r.shopping_sales||0);},0);
+    var totalGuide=reports.reduce(function(s,r){return s+(r.guide_fee||0);},0);
+    var totalIncome=totalSales+totalGuide;
+    var margin=totalIncome>0?(totalSales/totalIncome*100):0;
+
+    document.getElementById('period-total').innerText='$'+totalIncome.toLocaleString(undefined,{maximumFractionDigits:0});
+    document.getElementById('period-shopping').innerText='$'+totalSales.toLocaleString(undefined,{maximumFractionDigits:0});
+    document.getElementById('period-guide').innerText='$'+totalGuide.toLocaleString(undefined,{maximumFractionDigits:0});
+    document.getElementById('period-tours').innerText=reports.length;
+    document.getElementById('period-margin').innerText=margin.toFixed(1)+'%';
+
+    var tbody=document.getElementById('stats-tbody');
+    if(!reports.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--sub);padding:20px;">데이터 없음</td></tr>';
+      return;
+    }
+    tbody.innerHTML=reports.map(function(r){
+      var sales=r.shopping_sales||0;
+      var guide=r.guide_fee||0;
+      var total=sales+guide;
+      var m=total>0?(sales/total*100).toFixed(1):0;
+      return '<tr>'+
+        '<td>'+r.report_date+'</td>'+
+        '<td>'+(r.tour_name||'-')+'</td>'+
+        '<td>$'+sales.toLocaleString(undefined,{maximumFractionDigits:0})+'</td>'+
+        '<td>$'+guide.toLocaleString(undefined,{maximumFractionDigits:0})+'</td>'+
+        '<td><span class="margin-cell">'+m+'%</span></td>'+
+      '</tr>';
+    }).join('');
+
+    // END row
+    tbody.innerHTML+='<tr class="end-row">'+
+      '<td colspan="2">합계</td>'+
+      '<td>$'+totalSales.toLocaleString(undefined,{maximumFractionDigits:0})+'</td>'+
+      '<td>$'+totalGuide.toLocaleString(undefined,{maximumFractionDigits:0})+'</td>'+
+      '<td><span class="margin-cell">'+margin.toFixed(1)+'%</span></td>'+
+    '</tr>';
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+/* ══ OFFLINE ══ */
+window.addEventListener('offline',function(){document.getElementById('offline-banner').style.display='block';});
+window.addEventListener('online',function(){document.getElementById('offline-banner').style.display='none';});
+
+/* ══ INIT ══ */
+initApp();
 </script>
-</div>
-
 </body>
 </html>
